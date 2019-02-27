@@ -1,0 +1,6 @@
+
++ get comment node
+- get list of comments
++ create entity class for commentator(name,
+  time of posts, number of posts)
+- create map (K - commentID, V - userEntity)
