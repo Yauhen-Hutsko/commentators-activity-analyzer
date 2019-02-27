@@ -1,6 +1,7 @@
 
 package com.hutsko;
 
+import com.hutsko.entity.User;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,7 +16,7 @@ import java.util.Map;
 public class PageAnalyzer {
     private static final String FILE_PATH = "src/main/resource/fullPage.html";
 
-    private Map<String, String> commentators = new HashMap<>();
+    private static Map<String, String> commentators = new HashMap<>();
 
     public static void main(String[] args) {
         try {
@@ -26,13 +27,17 @@ public class PageAnalyzer {
 //            Element discussionNode = document.getElementById("fast-comments");
 
             for (Element element : allCommentElements) {
-                Elements nameNode = element.getElementsByClass("news-comment__name");
-                Elements timeNode = element.getElementsByClass("news-comment__time");
-                System.out.println(nameNode.text());
+                Element nameNode = element.getElementsByClass("news-comment__name").first();
+                Element timeNode = element.getElementsByClass("news-comment__time").first();
+                Elements likeNode = element.getElementsByClass("like-control news-comment__button news-comment__button_counter news-comment__button_counter_up");
+                Elements dislikeNode = element.getElementsByClass("like-control news-comment__button news-comment__button_counter news-comment__button_counter_down");
+                System.out.format(nameNode.text() + " has %s likes and %s dislikes\n", likeNode.text(), dislikeNode.text());
                 System.out.println(timeNode.text());
+//                commentators.putIfAbsent(uniqueName(nameNode),  );
+//                User user = new User(nameNode.text(), );
 //                System.out.println("nodeName: " + tupple.nodeName());
 //                System.out.println("size: " + tupple.childNodeSize());
-//                System.out.println("attribute name is: " + tupple.attr( "id") + "\n");
+                System.out.println("attribute name is: " + element.attr("id") + "\n");
 
             }
 //            System.out.println(document.title());
@@ -43,5 +48,12 @@ public class PageAnalyzer {
             System.err.println(e.getMessage());
         }
 
+    }
+
+    static String uniqueName(Element element) {
+        Element raw = element.getElementsByAttribute("href").get(1);
+        String link = raw.attr("href");
+        int lastSeparatorPosition = link.lastIndexOf("/");
+        return link.substring(lastSeparatorPosition + 1);
     }
 }

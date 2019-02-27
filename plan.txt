@@ -1,6 +1,7 @@
 
 + get comment node
 - get list of comments
-+ create entity class for commentator(name,
-  time of posts, number of posts)
+- create entity class for commentator(name,
+  time of posts, number of posts, likes)
 - create map (K - commentID, V - userEntity)
+- use name of user from link "https://profile.onliner.by/user/144984" for map Key
