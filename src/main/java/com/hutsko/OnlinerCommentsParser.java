@@ -39,7 +39,7 @@ public class OnlinerCommentsParser {
         return RequestUrlBuilder.buildUrl(appNode, QUANTITY_OF_LAST_COMMENTS);
     }
 
-    JsonNode uploadComments(String httpsRequestUrl) throws IOException {
+    JsonNode uploadCommentsFromURL(String httpsRequestUrl) throws IOException {
         URL url = new URL(httpsRequestUrl);
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
         StringBuilder stringBuilder = new StringBuilder();

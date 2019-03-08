@@ -26,5 +26,11 @@ public class JsonAnalyzer {
         }
     }
 
+    void userJsonToObjectMapping(JsonNode node){
+        JsonNode replies;
+        if ( !(replies = node.get("replies")).isNull()) {
+            userJsonToObjectMapping(replies);
+        }
 
+    }
 }
