@@ -2,24 +2,29 @@ package com.hutsko;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import com.hutsko.entity.Comment;
+import org.junit.*;
 
 import java.io.File;
-
-import static org.junit.Assert.*;
+import java.io.IOException;
+import java.util.List;
 
 public class JsonAnalyzerTest {
     public static final String JSON_TEST_FILE = "src/test/resource/test.json";
+    public static final String JSON_COMMENT_FILE = "src/test/resource/oneComment.json";
+    public static final String COMMENT_TEXT = "\u0418 \u043d\u0430\u043a\u0430\u043a\u043e\u0435 \u0430\u0439\u0442\u044b \u043d\u0435 \u043d\u0443\u0436\u043d\u043e...";
     private JsonAnalyzer analyzer;
     ObjectMapper mapper;
+    JsonNode inputJson;
+    JsonNode inputJsonWithReply;
 
     @Before
     public void setUp() throws Exception {
         mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readTree(new File(JSON_TEST_FILE));
-        analyzer = new JsonAnalyzer(jsonNode);
+        inputJson = mapper.readTree(new File(JSON_COMMENT_FILE));
+        inputJsonWithReply = mapper.readTree(new File(JSON_TEST_FILE));
+//        analyzer = new JsonAnalyzer(inputJson, "comments");
+        analyzer = new JsonAnalyzer();
     }
 
     @After
@@ -27,7 +32,19 @@ public class JsonAnalyzerTest {
     }
 
     @Test
-    public void test(){
-        analyzer.handleJson();
+    public void testCommentMappingJsonToObject() throws IOException {
+        analyzer.commentMappingJsonToObject(inputJsonWithReply);
+        Assert.assertEquals(3, analyzer.comments.size());
+
+    }
+
+    @Test
+    public void testCommentMapper() throws IOException {
+        Comment expected = new Comment("f0fb8cb0-378b-11e9-94b6-4b8dce91a276", "novikov433", "1322951",
+                10, 1, "2019-02-23T19:56:19.451000+03:00", COMMENT_TEXT);
+        List<Comment> actual = analyzer.handleJson(inputJson);
+
+        Assert.assertEquals(expected, actual.get(0));
+
     }
 }

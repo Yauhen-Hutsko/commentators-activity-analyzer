@@ -2,9 +2,10 @@
 + read the page
 + read variables from <app> tag and compose 1st request for getting last comment
 + parse response and compose second request for getting full comments json
-- process json
++ process json
 
-    - get list of comments
+    + create Comment entity
+    + get list of comments
     - create entity class for commentator(name,
       time of posts, number of posts, likes)
     - create map (K - commentID, V - userEntity)
@@ -12,4 +13,11 @@
 
 
 
+interested metrics
 
+ 1. How many days after publishing do ppl write comments
+ 2. How much likes\dislikes get the most active commentator
+ 3. A sex of the most active commentator
+ 4. A gap between an article issue and 1st comment was left.
+ 5. Map of daytime activity of the top commentator.
+ 6.

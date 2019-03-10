@@ -54,28 +54,4 @@ public class OnlinerCommentsParser {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readTree(stringBuilder.toString());
     }
-
-
-    void cannotThrowOldCode(Document document) {
-        Element node = document;
-        Elements allCommentElements = node.getElementsByAttributeValueStarting("id", "comment-");
-        for (Element element : allCommentElements) {
-            Element nameNode = element.getElementsByClass("news-comment__name").first();
-            Element timeNode = element.getElementsByClass("news-comment__time").first();
-            Elements likeNode = element.getElementsByClass("like-control news-comment__button news-comment__button_counter news-comment__button_counter_up");
-            Elements dislikeNode = element.getElementsByClass("like-control news-comment__button news-comment__button_counter news-comment__button_counter_down");
-            System.out.format(nameNode.text() + " has %s likes and %s dislikes\n", likeNode.text(), dislikeNode.text());
-            System.out.println(timeNode.text());
-//                commentators.putIfAbsent(uniqueName(nameNode),  );
-//                User user = new User(nameNode.text(), );
-//                System.out.println("nodeName: " + tupple.nodeName());
-//                System.out.println("size: " + tupple.childNodeSize());
-            System.out.println("attribute name is: " + element.attr("id") + "\n");
-
-        }
-//            System.out.println(document.title());
-//            System.out.println("elements by tag:" +allCommentElements.size() + "\n");
-//            System.out.println("discussionNode: " + discussionNode);
-        System.out.println("amount of comments:  " + allCommentElements.size());
-    }
 }
