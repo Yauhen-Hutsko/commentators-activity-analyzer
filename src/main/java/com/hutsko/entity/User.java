@@ -2,6 +2,9 @@ package com.hutsko.entity;
 
 import java.util.Map;
 
+/**
+ * <p>Endpoint class that represents unique user, all his comments and some related information</p>
+ */
 public class User {
     private String name;
     private Map<String, String> postCounter;

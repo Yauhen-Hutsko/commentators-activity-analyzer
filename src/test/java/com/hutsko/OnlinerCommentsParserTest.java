@@ -13,9 +13,9 @@ import java.io.IOException;
 
 public class OnlinerCommentsParserTest {
 
-    private String FILE_PATH = "https://tech.onliner.by/2019/02/20/muzykant-v-it";
+    private static final String FILE_PATH = "https://tech.onliner.by/2019/02/20/muzykant-v-it";
     private static final String REQUEST_FOR_LAST_COMMENT = "https://comments.api.onliner.by/news/tech.post/414510/comments?limit=1&v=0.33252155200390354";
-    public static final String TEST_DATA = "\n" +
+    private static final String TEST_DATA = "\n" +
             "<div class=\"news-grid__part news-grid__part_1\">\n" +
             "    <div id=\"fast-comments-root\">\n" +
             "        <div class=\"fast-comments\" id=\"fast-comments\">\n" +

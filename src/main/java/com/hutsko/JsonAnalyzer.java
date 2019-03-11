@@ -9,16 +9,28 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * This class uses for processing the response from Onliner.by which contains all information
- * about comments
+ * <p>This class uses for processing the JSON response from Onliner.by which contains all information
+ * about comments.</p>
  */
 public class JsonAnalyzer {
 
-    public static final String COMMENTS_NODE_NAME = "comments";
-    public static final String SUBCOMMENT_NODE_NAME = "replies";
+    private static final String COMMENTS_NODE_NAME = "comments";
+    private static final String SUBCOMMENTS_NODE_NAME = "replies";
+    private List<Comment> comments = new ArrayList<>();
     private Map<String, List<User>> commentators = new HashMap<>();
-    List<Comment> comments = new ArrayList<>();
     private ObjectMapper mapper = new ObjectMapper();
+
+    void commentMappingJsonToObject(JsonNode node) throws IOException {
+        JsonNode commentsNode = extractNodeByKey(node, COMMENTS_NODE_NAME);
+
+        for (JsonNode jsonNode : commentsNode) {
+            if (jsonNode.has(SUBCOMMENTS_NODE_NAME) && jsonNode.get(SUBCOMMENTS_NODE_NAME).size() != 0) {
+                //recursive mapping of subcomments
+                commentMappingJsonToObject(jsonNode.get(SUBCOMMENTS_NODE_NAME));
+            }
+        }
+        comments.addAll(handleJson(node));
+    }
 
     List<Comment> handleJson(JsonNode inputNode) throws IOException {
         List<Comment> comments = new ArrayList<>();
@@ -31,19 +43,11 @@ public class JsonAnalyzer {
         return comments;
     }
 
-    void commentMappingJsonToObject(JsonNode node) throws IOException {
-        JsonNode commentsNode = extractNodeByKey(node, COMMENTS_NODE_NAME);
-
-        for (JsonNode jsonNode : commentsNode) {
-            if (jsonNode.has(SUBCOMMENT_NODE_NAME) && jsonNode.get(SUBCOMMENT_NODE_NAME).size() != 0) {
-                //recursive mapping of subcomments
-                commentMappingJsonToObject(jsonNode.get(SUBCOMMENT_NODE_NAME));
-            }
-        }
-        comments.addAll(handleJson(node));
-    }
-
     private JsonNode extractNodeByKey(JsonNode node, String key) {
         return (node.has(key))? node.get(key): node;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
     }
 }

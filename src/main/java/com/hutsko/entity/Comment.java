@@ -6,6 +6,11 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * <p>{@code Comment} is a transitional class that aggregates all fields of comments I'm interested in,
+ * from json response.</p>
+ * <p>This class uses for creating a list of all comments for further sorting by authors.</p>
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Comment {
     private String id;
