@@ -1,5 +1,6 @@
 package com.hutsko.entity;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -7,11 +8,14 @@ import java.util.Map;
  */
 public class User {
     private String name;
-    private Map<String, String> postCounter;
+//    private int commentCounter;
+    private int likeCounter;
+    private int dislikeCounter;
+    private Map<String, String> messages;   //k - timestamp, v - message's body
 
-    public User(String name, Map<String, String> postCounter){
-        this.name = name;
-        this.postCounter = postCounter;
+
+    public User(){
+        messages = new HashMap<>();
     };
 
 
@@ -23,12 +27,39 @@ public class User {
         this.name = name;
     }
 
-    public Map<String, String> getPostCounter() {
-        return postCounter;
+//    public int getCommentCounter() {
+//        return commentCounter;
+//    }
+
+//    public void setCommentCounter(int commentCounter) {
+//        this.commentCounter = commentCounter;
+//    }
+
+    public int getLikeCounter() {
+        return likeCounter;
     }
 
-    public void setPostCounter(Map<String, String> postCounter) {
-        this.postCounter = postCounter;
+    public void setLikeCounter(int likeCounter) {
+        this.likeCounter = likeCounter;
     }
 
+    public int getDislikeCounter() {
+        return dislikeCounter;
+    }
+
+    public void setDislikeCounter(int dislikeCounter) {
+        this.dislikeCounter = dislikeCounter;
+    }
+
+    public Map<String, String> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(Map<String, String> messages) {
+        this.messages = messages;
+    }
+
+    public void addMessage(String key, String value) {
+        messages.put(key, value);
+    }
 }

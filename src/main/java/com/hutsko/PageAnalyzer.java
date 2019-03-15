@@ -1,28 +1,35 @@
-
 package com.hutsko;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hutsko.entity.User;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Map;
 
 public class PageAnalyzer {
-    private static final String FILE_PATH = "https://tech.onliner.by/2019/02/20/muzykant-v-it";
     public static final String GET_ALL_COMMENTS_REQUEST_PATH = "https://comments.api.onliner.by/news/tech.post/414510/comments?limit=99999";
-
+    private static final String FILE_PATH = "https://tech.onliner.by/2019/02/20/muzykant-v-it";
 
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
-        OnlinerCommentsParser parser = new OnlinerCommentsParser(GET_ALL_COMMENTS_REQUEST_PATH);
+        OnlinerCommentsParser parser = new OnlinerCommentsParser(FILE_PATH);
+        Document document = parser.readHtmlPageSourceCode();
+        String commentsUrl = parser.extractUrlForGettingComments(document);
         try {
-            JsonNode commentsNode = parser.uploadCommentsFromURL(GET_ALL_COMMENTS_REQUEST_PATH);
+            JsonNode commentsNode = parser.uploadCommentsFromURL(commentsUrl);
             JsonAnalyzer analyzer = new JsonAnalyzer();
             analyzer.commentMappingJsonToObject(commentsNode);
+            System.out.println("Quantity of comments: " + analyzer.getComments().size());
 
-            System.out.println(analyzer.comments.size());
+            Map<String, User> userMap = analyzer.makeMeHappy();
+            System.out.println("Unique users: " + userMap.size());
+
+            System.out.println();
             long endTime = System.currentTimeMillis();
-            System.out.println("Time of evaluating(second): " + Duration.ofMillis(endTime-startTime));
+            System.out.println("Time of evaluating(second): " + Duration.ofMillis(endTime - startTime));
 
         } catch (IOException e) {
             e.printStackTrace();

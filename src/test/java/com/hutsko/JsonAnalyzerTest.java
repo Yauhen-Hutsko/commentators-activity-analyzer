@@ -3,11 +3,16 @@ package com.hutsko;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hutsko.entity.Comment;
-import org.junit.*;
+import com.hutsko.entity.User;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class JsonAnalyzerTest {
     private static final String JSON_TEST_FILE = "src/test/resource/test.json";
@@ -27,7 +32,7 @@ public class JsonAnalyzerTest {
 
     @After
     public void tearDown() throws Exception {
-
+        analyzer = null;
     }
 
     @Test
@@ -48,9 +53,13 @@ public class JsonAnalyzerTest {
     }
 
     @Test
-    public void test(){
-//        analyzer.getUsers();
-
+    public void testMakeMeHappy() throws IOException {
+        analyzer.commentMappingJsonToObject(inputJsonWithReply);
+        Map<String, User> commentators = analyzer.makeMeHappy();
+        int usersInCollection = commentators.size();
+        int numberOfComments = commentators.get("1322951").getMessages().size();
+        Assert.assertEquals(1, usersInCollection);
+        Assert.assertEquals(3, numberOfComments);
     }
 
 }

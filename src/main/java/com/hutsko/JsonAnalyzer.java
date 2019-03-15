@@ -17,9 +17,50 @@ public class JsonAnalyzer {
     private static final String COMMENTS_NODE_NAME = "comments";
     private static final String SUBCOMMENTS_NODE_NAME = "replies";
     private List<Comment> comments = new ArrayList<>();
-    private Map<String, List<User>> commentators = new HashMap<>();
+
     private ObjectMapper mapper = new ObjectMapper();
 
+    /**
+     * Create map of unique users with all history of their comments
+     * @return HashMap where Key = userId, Value = User
+     */
+    Map<String, User> makeMeHappy(){
+        Map<String, User> commentators = new HashMap<>();
+        for (Comment comment : comments) {
+            if (commentators.containsKey(comment.getAuthorId())) {
+                //add comment to existed user
+                createUserFromComment(comment, commentators.get(comment.getAuthorId()));
+            } else {
+                commentators.put(comment.getAuthorId(), createUserFromComment(comment, null));
+            }
+        }
+        return commentators;
+    }
+
+    /**
+     * It adds Comment into User.  New user will be created if <code>user</code> param is null.
+     * Otherwise comment will be added to provided user.
+     * @param comment
+     * @param user
+     * @return
+     */
+    private User createUserFromComment(final Comment comment, User user) {
+        if (user == null) {
+            user = new User();
+        }
+        user.setName(comment.getAuthorName());
+//        user.setCommentCounter(comment.);
+        user.setDislikeCounter(comment.getDislikes());
+        user.setLikeCounter(comment.getLikes());
+        user.addMessage(comment.getId(), comment.getText());
+        return user;
+    }
+
+    /**
+     * <p>Method saved list of comment objects into class variable {@code comments}. Use method {@code getComments()} for getting results.</p>
+     * <p>It's void because otherwise recursive invocation returns only result from the method on the top of the stack.</p>
+     * <p>todo: Consider double if-condition instead of recursion because max nesting level for 'onliner' = 1</p>
+     */
     void commentMappingJsonToObject(JsonNode node) throws IOException {
         JsonNode commentsNode = extractNodeByKey(node, COMMENTS_NODE_NAME);
 
