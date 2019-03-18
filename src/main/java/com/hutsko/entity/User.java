@@ -8,16 +8,16 @@ import java.util.Map;
  */
 public class User {
     private String name;
-//    private int commentCounter;
+    //    private int commentCounter;
     private int likeCounter;
     private int dislikeCounter;
     private Map<String, String> messages;   //k - timestamp, v - message's body
 
-
-    public User(){
+    public User() {
         messages = new HashMap<>();
-    };
+    }
 
+    ;
 
     public String getName() {
         return name;
@@ -26,14 +26,6 @@ public class User {
     public void setName(String name) {
         this.name = name;
     }
-
-//    public int getCommentCounter() {
-//        return commentCounter;
-//    }
-
-//    public void setCommentCounter(int commentCounter) {
-//        this.commentCounter = commentCounter;
-//    }
 
     public int getLikeCounter() {
         return likeCounter;
@@ -55,11 +47,29 @@ public class User {
         return messages;
     }
 
-    public void setMessages(Map<String, String> messages) {
-        this.messages = messages;
-    }
+//    public void setMessages(Map<String, String> messages) {
+//        this.messages = messages;
+//    }
 
     public void addMessage(String key, String value) {
         messages.put(key, value);
+    }
+
+    private String printMessagesToConsole(){
+        StringBuilder sb = new StringBuilder("\n");
+        for (String value : messages.values()) {
+            sb.append("-> ").append(value).append("\n");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "User{"
+                + "name='" + name + '\'' + "\n"
+                + ", likeCounter=" + likeCounter + "\n"
+                + ", dislikeCounter=" + dislikeCounter + "\n"
+                + ", messages(" + messages.size() + ")=" + printMessagesToConsole()
+                + '}';
     }
 }

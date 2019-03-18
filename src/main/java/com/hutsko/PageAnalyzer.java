@@ -7,15 +7,19 @@ import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Optional;
 
 public class PageAnalyzer {
     public static final String GET_ALL_COMMENTS_REQUEST_PATH = "https://comments.api.onliner.by/news/tech.post/414510/comments?limit=99999";
     private static final String FILE_PATH = "https://tech.onliner.by/2019/02/20/muzykant-v-it";
+    private static final String FILE_PATH_2 = "https://people.onliner.by/2018/12/07/dating-2";
+
 
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
-        OnlinerCommentsParser parser = new OnlinerCommentsParser(FILE_PATH);
+        OnlinerCommentsParser parser = new OnlinerCommentsParser(FILE_PATH_2);
         Document document = parser.readHtmlPageSourceCode();
         String commentsUrl = parser.extractUrlForGettingComments(document);
         try {
@@ -27,7 +31,8 @@ public class PageAnalyzer {
             Map<String, User> userMap = analyzer.makeMeHappy();
             System.out.println("Unique users: " + userMap.size());
 
-            System.out.println();
+            Optional<User> user = userMap.values().stream().max(Comparator.comparingInt(o -> o.getMessages().size()));
+            System.out.println(user.get());
             long endTime = System.currentTimeMillis();
             System.out.println("Time of evaluating(second): " + Duration.ofMillis(endTime - startTime));
 

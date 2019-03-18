@@ -50,8 +50,8 @@ public class JsonAnalyzer {
         }
         user.setName(comment.getAuthorName());
 //        user.setCommentCounter(comment.);
-        user.setDislikeCounter(comment.getDislikes());
-        user.setLikeCounter(comment.getLikes());
+        user.setDislikeCounter(user.getDislikeCounter() + comment.getDislikes());
+        user.setLikeCounter(user.getLikeCounter() + comment.getLikes());
         user.addMessage(comment.getId(), comment.getText());
         return user;
     }
