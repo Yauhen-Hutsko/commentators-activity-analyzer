@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-public class OnlinerCommentsParserTest {
+public class OnlinerCommentsLoaderTest {
 
     private static final String FILE_PATH = "https://tech.onliner.by/2019/02/20/muzykant-v-it";
     private static final String REQUEST_FOR_LAST_COMMENT = "https://comments.api.onliner.by/news/tech.post/414510/comments?limit=1&v=0.33252155200390354";
@@ -28,12 +28,12 @@ public class OnlinerCommentsParserTest {
             "    </div>\n" +
             "    <script src=\"https://tech.onliner.by/assets/fast-comments.3967d3c2b80889d3.js\"></script>\n" +
             "</div>";
-    private OnlinerCommentsParser parser;
+    private OnlinerCommentsLoader parser;
     private RequestUrlBuilder builder;
 
     @Before
     public void setUp() throws Exception {
-        parser = new OnlinerCommentsParser(FILE_PATH);
+        parser = new OnlinerCommentsLoader(FILE_PATH);
         builder = new RequestUrlBuilder();
     }
 

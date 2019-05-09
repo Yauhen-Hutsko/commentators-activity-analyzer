@@ -15,15 +15,16 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 
-public class OnlinerCommentsParser {
+public class OnlinerCommentsLoader {
 
     private static final int QUANTITY_OF_LAST_COMMENTS = 99999;
     private String pageUrl;
 
-    OnlinerCommentsParser(String pageUrl) {
+    OnlinerCommentsLoader(String pageUrl) {
         this.pageUrl = pageUrl;
     }
 
+    //TODO: make this method public API and make methods below private. Tests?
     Document readHtmlPageSourceCode() {
         Document document = null;
         try {

@@ -20,11 +20,15 @@ public class JsonAnalyzer {
 
     private ObjectMapper mapper = new ObjectMapper();
 
+    public List<Comment> getComments() {
+        return comments;
+    }
+
     /**
      * Create map of unique users with all history of their comments
      * @return HashMap where Key = userId, Value = User
      */
-    Map<String, User> makeMeHappy(){
+    Map<String, User> getAllUsers(){
         Map<String, User> commentators = new HashMap<>();
         for (Comment comment : comments) {
             if (commentators.containsKey(comment.getAuthorId())) {
@@ -49,7 +53,6 @@ public class JsonAnalyzer {
             user = new User();
         }
         user.setName(comment.getAuthorName());
-//        user.setCommentCounter(comment.);
         user.setDislikeCounter(user.getDislikeCounter() + comment.getDislikes());
         user.setLikeCounter(user.getLikeCounter() + comment.getLikes());
         user.addMessage(comment.getId(), comment.getText());
@@ -57,23 +60,23 @@ public class JsonAnalyzer {
     }
 
     /**
-     * <p>Method saved list of comment objects into class variable {@code comments}. Use method {@code getComments()} for getting results.</p>
+     * <p>Method saves the list of comment objects into the class variable {@code comments}. Use the method {@code getComments()} for getting results.</p>
      * <p>It's void because otherwise recursive invocation returns only result from the method on the top of the stack.</p>
      * <p>todo: Consider double if-condition instead of recursion because max nesting level for 'onliner' = 1</p>
      */
-    void commentMappingJsonToObject(JsonNode node) throws IOException {
+    void fillComments(final JsonNode node) throws IOException {
         JsonNode commentsNode = extractNodeByKey(node, COMMENTS_NODE_NAME);
 
         for (JsonNode jsonNode : commentsNode) {
             if (jsonNode.has(SUBCOMMENTS_NODE_NAME) && jsonNode.get(SUBCOMMENTS_NODE_NAME).size() != 0) {
                 //recursive mapping of subcomments
-                commentMappingJsonToObject(jsonNode.get(SUBCOMMENTS_NODE_NAME));
+                fillComments(jsonNode.get(SUBCOMMENTS_NODE_NAME));
             }
         }
-        comments.addAll(handleJson(node));
+        comments.addAll(extractCommentsFromJsonToObject(commentsNode));
     }
 
-    List<Comment> handleJson(JsonNode inputNode) throws IOException {
+    List<Comment> extractCommentsFromJsonToObject(JsonNode inputNode) throws IOException {
         List<Comment> comments = new ArrayList<>();
         JsonNode commentsNode = extractNodeByKey(inputNode, COMMENTS_NODE_NAME);
 
@@ -86,9 +89,5 @@ public class JsonAnalyzer {
 
     private JsonNode extractNodeByKey(JsonNode node, String key) {
         return (node.has(key))? node.get(key): node;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
     }
 }
