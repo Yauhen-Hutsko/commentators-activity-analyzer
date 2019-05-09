@@ -16,7 +16,7 @@ public class JsonAnalyzer {
 
     private static final String COMMENTS_NODE_NAME = "comments";
     private static final String SUBCOMMENTS_NODE_NAME = "replies";
-    private List<Comment> comments = new ArrayList<>();
+    private final List<Comment> comments = new ArrayList<>();
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -39,24 +39,6 @@ public class JsonAnalyzer {
             }
         }
         return commentators;
-    }
-
-    /**
-     * It adds Comment into User.  New user will be created if <code>user</code> param is null.
-     * Otherwise comment will be added to provided user.
-     * @param comment
-     * @param user
-     * @return
-     */
-    private User createUserFromComment(final Comment comment, User user) {
-        if (user == null) {
-            user = new User();
-        }
-        user.setName(comment.getAuthorName());
-        user.setDislikeCounter(user.getDislikeCounter() + comment.getDislikes());
-        user.setLikeCounter(user.getLikeCounter() + comment.getLikes());
-        user.addMessage(comment.getId(), comment.getText());
-        return user;
     }
 
     /**
@@ -85,6 +67,24 @@ public class JsonAnalyzer {
             comments.add(comment);
         }
         return comments;
+    }
+
+    /**
+     * It adds Comment into User.  New user will be created if <code>user</code> param is null.
+     * Otherwise comment will be added to provided user.
+     * @param comment
+     * @param user
+     * @return
+     */
+    private User createUserFromComment(final Comment comment, User user) {
+        if (user == null) {
+            user = new User();
+        }
+        user.setName(comment.getAuthorName());
+        user.setDislikeCounter(user.getDislikeCounter() + comment.getDislikes());
+        user.setLikeCounter(user.getLikeCounter() + comment.getLikes());
+        user.addMessage(comment.getCreated(), comment.getText());
+        return user;
     }
 
     private JsonNode extractNodeByKey(JsonNode node, String key) {
