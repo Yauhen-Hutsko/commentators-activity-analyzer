@@ -32,12 +32,12 @@ public class PageAnalyzerTest {
     public void tearDown() throws Exception {
     }
 
-    @Test
+//    @Test
     public void testUniqueName() {
-//        String name = PageAnalyzer.uniqueName(allCommentElements.get(0));
-//        System.out.println(name);
-//        Assert.assertNotNull(name);
-//        Assert.assertNotEquals(name, "");
+        String name = PageAnalyzer.uniqueName(allCommentElements.get(0));
+        System.out.println(name);
+        Assert.assertNotNull(name);
+        Assert.assertNotEquals(name, "");
 
     }
 }

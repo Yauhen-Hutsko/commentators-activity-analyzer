@@ -17,18 +17,25 @@ public class JsonAnalyzer {
     private static final String COMMENTS_NODE_NAME = "comments";
     private static final String SUBCOMMENTS_NODE_NAME = "replies";
     private final List<Comment> comments = new ArrayList<>();
-
+    private final Map<String, User> users = new HashMap<>();
     private ObjectMapper mapper = new ObjectMapper();
 
     public List<Comment> getComments() {
         return comments;
     }
 
+    public Map<String, User> getCommentators() {
+        return users;
+    }
+
     /**
-     * Create map of unique users with all history of their comments
-     * @return HashMap where Key = userId, Value = User
+     * <p>Create map of unique users with all history of their comments and store it in a hashMap {@code users}
+     * where Key = userId, Value = User</p>
+     * <p>Use the method {@code getCommentators()} for getting results.</p>
+     *
      */
-    Map<String, User> getAllUsers(){
+    void fillCommentators(){
+        //todo: better to make this method private and invoke him inside the class as a part of a preparation.
         Map<String, User> commentators = new HashMap<>();
         for (Comment comment : comments) {
             if (commentators.containsKey(comment.getAuthorId())) {
@@ -38,7 +45,7 @@ public class JsonAnalyzer {
                 commentators.put(comment.getAuthorId(), createUserFromComment(comment, null));
             }
         }
-        return commentators;
+         users.putAll(commentators);
     }
 
     /**

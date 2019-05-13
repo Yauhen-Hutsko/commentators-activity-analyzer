@@ -28,7 +28,7 @@ public class PageAnalyzer {
             jsonAnalyzer.fillComments(commentsNode);
             System.out.println("Quantity of comments: " + jsonAnalyzer.getComments().size());
 
-            Map<String, User> userMap = jsonAnalyzer.getAllUsers();
+            Map<String, User> userMap = jsonAnalyzer.getCommentators();
             System.out.println("Unique users: " + userMap.size());
 
             Optional<User> user = userMap.values().stream().max(Comparator.comparingInt(o -> o.getMessages().size()));

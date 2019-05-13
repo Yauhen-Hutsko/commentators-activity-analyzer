@@ -10,11 +10,12 @@
       time of posts, number of posts, likes,
       most\least PopularComment)
     + create map (K - commentID, V - userEntity)
-    - method for getting most liked/hated commentator
+    + method for getting most liked/hated commentator
+- create API for working with parsed data
 - convert timestamps from String to Instant class
 
 
-interested metrics
+Interesting metrics
 
  1. How many days after publishing do ppl write comments
  2. How much likes\dislikes get the most active commentator

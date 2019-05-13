@@ -36,7 +36,7 @@ public class JsonAnalyzerTest {
     }
 
     @Test
-    public void testfillComments() throws IOException {
+    public void testFillComments() throws IOException {
         analyzer.fillComments(inputJsonWithReply);
         Assert.assertEquals(3, analyzer.getComments().size());
 
@@ -53,9 +53,10 @@ public class JsonAnalyzerTest {
     }
 
     @Test
-    public void testgetAllUsers() throws IOException {
+    public void testGetAllUsers() throws IOException {
         analyzer.fillComments(inputJsonWithReply);
-        Map<String, User> commentators = analyzer.getAllUsers();
+        analyzer.fillCommentators();
+        Map<String, User> commentators = analyzer.getCommentators();
         int usersInCollection = commentators.size();
         int numberOfComments = commentators.get("1322951").getMessages().size();
         Assert.assertEquals(1, usersInCollection);
