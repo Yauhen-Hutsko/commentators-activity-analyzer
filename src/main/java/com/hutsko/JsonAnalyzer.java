@@ -17,14 +17,14 @@ public class JsonAnalyzer {
     private static final String COMMENTS_NODE_NAME = "comments";
     private static final String SUBCOMMENTS_NODE_NAME = "replies";
     private final List<Comment> comments = new ArrayList<>();
-    private final Map<String, User> users = new HashMap<>();
+    private final Map<Integer, User> users = new HashMap<>();
     private ObjectMapper mapper = new ObjectMapper();
 
     public List<Comment> getComments() {
         return comments;
     }
 
-    public Map<String, User> getCommentators() {
+    public Map<Integer, User> getCommentators() {
         return users;
     }
 
@@ -36,7 +36,7 @@ public class JsonAnalyzer {
      */
     void fillCommentators(){
         //todo: better to make this method private and invoke him inside the class as a part of a preparation.
-        Map<String, User> commentators = new HashMap<>();
+        Map<Integer, User> commentators = new HashMap<>();
         for (Comment comment : comments) {
             if (commentators.containsKey(comment.getAuthorId())) {
                 //add comment to existed user
@@ -87,6 +87,7 @@ public class JsonAnalyzer {
         if (user == null) {
             user = new User();
         }
+        user.setId(comment.getAuthorId());
         user.setName(comment.getAuthorName());
         user.setDislikeCounter(user.getDislikeCounter() + comment.getDislikes());
         user.setLikeCounter(user.getLikeCounter() + comment.getLikes());

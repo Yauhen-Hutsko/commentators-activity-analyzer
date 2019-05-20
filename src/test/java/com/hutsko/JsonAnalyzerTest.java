@@ -44,7 +44,7 @@ public class JsonAnalyzerTest {
 
     @Test
     public void testCommentMapper() throws IOException {
-        Comment expected = new Comment("f0fb8cb0-378b-11e9-94b6-4b8dce91a276", "novikov433", "1322951",
+        Comment expected = new Comment("f0fb8cb0-378b-11e9-94b6-4b8dce91a276", "novikov433", 1322951,
                 10, 1, "2019-02-23T19:56:19.451000+03:00", COMMENT_TEXT);
         List<Comment> actual = analyzer.extractCommentsFromJsonToObject(inputJson);
 
@@ -56,9 +56,9 @@ public class JsonAnalyzerTest {
     public void testGetAllUsers() throws IOException {
         analyzer.fillComments(inputJsonWithReply);
         analyzer.fillCommentators();
-        Map<String, User> commentators = analyzer.getCommentators();
+        Map<Integer, User> commentators = analyzer.getCommentators();
         int usersInCollection = commentators.size();
-        int numberOfComments = commentators.get("1322951").getMessages().size();
+        int numberOfComments = commentators.get(1322951).getMessages().size();
         Assert.assertEquals(1, usersInCollection);
         Assert.assertEquals(3, numberOfComments);
     }

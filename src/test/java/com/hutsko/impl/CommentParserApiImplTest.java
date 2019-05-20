@@ -1,8 +1,9 @@
-package com.hutsko;
+package com.hutsko.impl;
 
+import com.hutsko.CommentParserApi;
+import com.hutsko.JsonAnalyzer;
 import com.hutsko.entity.Comment;
 import com.hutsko.entity.User;
-import com.hutsko.impl.CommentParserApiImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,13 +11,16 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class CommentParserAPITest {
+public class CommentParserApiImplTest {
 
     @Mock
     private CommentParserApi parserAPI;
-    private Map<String, User> users = new HashMap<>();
+    private Map<Integer, User> users = new HashMap<>();
     private List<Comment> comments = new ArrayList<>();
 
     @Before
@@ -70,13 +74,13 @@ public class CommentParserAPITest {
     private void prepareComments() {
         for (int i = 0; i < 3; i++) {
             Comment comment = new Comment();
-            comment.setLikes(i*3);
-            comment.setDislikes(i*5);
+            comment.setLikes(i * 3);
+            comment.setDislikes(i * 5);
             comments.add(comment);
             User user = new User();
-            user.setLikeCounter(i*30);
-            user.setDislikeCounter(i*50);
-            users.put(String.valueOf(i), user);
+            user.setLikeCounter(i * 30);
+            user.setDislikeCounter(i * 50);
+            users.put(i, user);
         }
     }
 }

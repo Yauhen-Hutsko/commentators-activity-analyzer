@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * <p>{@code Comment} is a transitional class that aggregates all fields of comments I'm interested in,
+ * <p>{@code Comment} is a transitional class that aggregates all comment information received
  * from json response.</p>
  * <p>This class uses for creating a list of all comments for further sorting by authors.</p>
  */
@@ -15,7 +15,7 @@ import java.util.Objects;
 public class Comment {
     private String id;
     private String authorName;
-    private String authorId;
+    private int authorId;
     private int likes;
     private int dislikes;
     private String created;
@@ -24,7 +24,7 @@ public class Comment {
     public Comment() {
     }
 
-    public Comment(String id, String authorName, String authorId, int likes, int dislikes, String created, String text) {
+    public Comment(String id, String authorName, int authorId, int likes, int dislikes, String created, String text) {
         this.id = id;
         this.authorName = authorName;
         this.authorId = authorId;
@@ -42,7 +42,7 @@ public class Comment {
         return authorName;
     }
 
-    public String getAuthorId() {
+    public int getAuthorId() {
         return authorId;
     }
 
@@ -71,7 +71,7 @@ public class Comment {
         this.authorName = authorName;
     }
 
-    public void setAuthorId(String authorId) {
+    public void setAuthorId(int authorId) {
         this.authorId = authorId;
     }
 
@@ -101,7 +101,7 @@ public class Comment {
 
     @JsonSetter("author")
     public void setAuthorData(Map<String, String> map) {
-        setAuthorId(map.get("id"));
+        setAuthorId(Integer.valueOf(map.get("id")));
         setAuthorName(map.get("name"));
     }
 
