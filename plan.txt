@@ -11,9 +11,9 @@
       most\least PopularComment)
     + create map (K - commentID, V - userEntity)
     + method for getting most liked/hated commentator
-- create API for working with parsed data
-- convert timestamps from String to LocalDateTime class
-
++ create API for working with parsed data
++ convert timestamps from String to LocalDateTime class
+- add some web representation of interesting data
 
 Interesting metrics
 
