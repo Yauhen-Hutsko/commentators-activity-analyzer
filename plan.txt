@@ -12,7 +12,7 @@
     + create map (K - commentID, V - userEntity)
     + method for getting most liked/hated commentator
 - create API for working with parsed data
-- convert timestamps from String to Instant class
+- convert timestamps from String to LocalDateTime class
 
 
 Interesting metrics

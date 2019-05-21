@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,33 +40,39 @@ public class CommentParserApiImplTest {
     }
 
     @Test
-    public void getUserActivity() {
-
+    public void testGetUserActivity() {
+        List<LocalDateTime> timestamps = parserAPI.getUserActivity(666);
+        LocalDateTime expected1 = LocalDateTime.parse("2019-05-04T11:42:55.434");
+        LocalDateTime expected2 = LocalDateTime.parse("2019-05-04T11:40:55.434");
+        LocalDateTime expected3 = LocalDateTime.parse("2019-05-04T11:41:55.434");
+        Assert.assertEquals(expected1, timestamps.get(0));
+        Assert.assertEquals(expected2, timestamps.get(1));
+        Assert.assertEquals(expected3, timestamps.get(2));
     }
 
     @Test
-    public void getBestComment() {
+    public void testGetBestComment() {
         Comment comment = parserAPI.getBestComment();
         System.out.format("Worst comment has %s likes\n", comment.getLikes());
         Assert.assertEquals(6, comment.getLikes());
     }
 
     @Test
-    public void getWorstComment() {
+    public void testGetWorstComment() {
         Comment comment = parserAPI.getWorstComment();
         System.out.format("Worst comment has %s dislikes\n", comment.getDislikes());
         Assert.assertEquals(10, comment.getDislikes());
     }
 
     @Test
-    public void getBestUser() {
+    public void testGetBestUser() {
         User user = parserAPI.getBestUser();
         System.out.format("Best user has %s likes\n", user.getLikeCounter());
         Assert.assertEquals(60, user.getLikeCounter());
     }
 
     @Test
-    public void getWorstUser() {
+    public void testGetWorstUser() {
         User user = parserAPI.getWorstUser();
         System.out.format("Worst user has %s dislikes\n", user.getDislikeCounter());
         Assert.assertEquals(100, user.getDislikeCounter());
@@ -76,11 +83,22 @@ public class CommentParserApiImplTest {
             Comment comment = new Comment();
             comment.setLikes(i * 3);
             comment.setDislikes(i * 5);
+            comment.setCreated(String.format("2019-05-04T11:4%s:55.434000+03:00", i));
+            comment.setText("empty text");
             comments.add(comment);
+        }
+        prepareUsers(comments);
+    }
+
+    private void prepareUsers(List<Comment> comments) {
+        for (int i = 0; i < 3; i++) {
             User user = new User();
+            user.setId(665 + i);
             user.setLikeCounter(i * 30);
             user.setDislikeCounter(i * 50);
-            users.put(i, user);
+//            user.addMessage(comments.get(i).getCreated(), comments.get(i).getText());
+            comments.forEach(comment -> user.addMessage(comment.getCreated(), comment.getText()));
+            users.put(665 + i, user);
         }
     }
 }
