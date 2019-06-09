@@ -1,13 +1,16 @@
 package com.hutsko;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hutsko.entity.Comment;
 import com.hutsko.entity.User;
+import com.hutsko.impl.CommentParserApiImpl;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Comparator;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,13 +29,27 @@ public class PageAnalyzer {
             JsonNode commentsNode = parser.uploadCommentsFromURL(commentsUrl);
             JsonAnalyzer jsonAnalyzer = new JsonAnalyzer();
             jsonAnalyzer.fillComments(commentsNode);
+            jsonAnalyzer.fillCommentators();
+            CommentParserApi cpa = new CommentParserApiImpl(jsonAnalyzer);
+            System.out.format("The article \"%s\" was created at %s\n", parser.getTitle(), parser.getCreated());
             System.out.println("Quantity of comments: " + jsonAnalyzer.getComments().size());
 
             Map<Integer, User> userMap = jsonAnalyzer.getCommentators();
             System.out.println("Unique users: " + userMap.size());
 
-            Optional<User> user = userMap.values().stream().max(Comparator.comparingInt(o -> o.getMessages().size()));
-            System.out.println(user.get());
+            Optional<User> bestUser = Optional.of(cpa.getBestUser());
+            Optional<User> worstUser = Optional.of(cpa.getWorstUser());
+            Optional<Comment> bestComment = Optional.of(cpa.getBestComment());
+            Optional<Comment> worstComment = Optional.of(cpa.getWorstComment());
+            List<LocalDateTime> userActivity = cpa.getUserActivity(1479142);
+            String userName = userMap.get(1479142).getName();
+
+//            Optional<User> user = cpa.getBestUser();
+//            System.out.println(bestUser.get());
+//            System.out.println(worstUser.get());
+//            System.out.println(bestComment.get());
+//            System.out.println(worstComment.get());
+            System.out.format("User %1s : %2s", userName, userActivity);
             long endTime = System.currentTimeMillis();
             System.out.println("Time of evaluating(second): " + Duration.ofMillis(endTime - startTime));
 

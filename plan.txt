@@ -2,7 +2,7 @@
 + read the page
 + read variables from <app> tag and compose 1st request for getting last comment
 + parse response and compose second request for getting full comments json
-- save a title of the article, its publication time.
++ save a title of the article, its publication time.
 + process json
     + create Comment entity
     + get list of comments
@@ -14,7 +14,7 @@
 + create API for working with parsed data
 + convert timestamps from String to LocalDateTime class
 - add some web representation of interesting data
-
+- Refactor accordingly SOLID principles
 Interesting metrics
 
  1. How many days after publishing do ppl write comments

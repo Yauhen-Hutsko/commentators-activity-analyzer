@@ -13,7 +13,6 @@ import java.util.*;
  * about comments.</p>
  */
 public class JsonAnalyzer {
-
     private static final String COMMENTS_NODE_NAME = "comments";
     private static final String SUBCOMMENTS_NODE_NAME = "replies";
     private final List<Comment> comments = new ArrayList<>();
