@@ -20,7 +20,7 @@
         <jsoup.version>1.11.3</jsoup.version>
         <junit.version>4.11</junit.version>
         <jsonPath.version>2.4.0</jsonPath.version>
-        <jackson.version>2.9.8</jackson.version>
+        <jackson.version>2.9.9</jackson.version>
     </properties>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
