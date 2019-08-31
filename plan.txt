@@ -13,16 +13,16 @@
     + method for getting most liked/hated commentator
 + create API for working with parsed data
 + convert timestamps from String to LocalDateTime class
++ Search comments by words
 - add some web representation of interesting data
 - Refactor accordingly SOLID principles
-- Add search comments by words
 - implement reading URL from console, otherwise first line from file.
-Interesting metrics
 
+Interesting metrics:
  1. How many days after publishing do ppl write comments
  2. How much likes\dislikes get the most active commentator
- 3. A sex of the most active commentator(and a sex of a hero of the article). How it corresponds with a protagonist?
+ 3. A sex of the most active commentator(and a sex of a hero of an article). How it corresponds with a protagonist?
  4. A gap between an article issue and the first\last comment was left.
  5. Map of daytime activity by a commentator.
- 6. Analyze difference and find deleted comments.
+ 6. Analyze difference and find deleted/changed comments.
  7. Find all user activity (multi-article analysis)

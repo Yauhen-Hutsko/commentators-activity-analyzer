@@ -80,12 +80,11 @@ public class CommentParserApiImpl implements CommentParserApi {
     }
 
     /**
-     *
-     * @param phrase - word or sentence
+     * @param phrase word or sentence.
      * @return list of comments which contain desired phrase. If phrase is empty, then return no comments.
      */
     @Override
-    public List<Comment> findCommentByWords(String phrase) {
+    public List<Comment> findCommentsByText(String phrase) {
         List<Comment> comments = analyzer.getComments();
         List<Comment> found = new ArrayList<>();
 

@@ -8,7 +8,7 @@ import java.util.Objects;
 
 /**
  * <p>{@code Comment} is a transitional class that aggregates all comment information received
- * from json response.</p>
+ * from site's json-response.</p>
  * <p>This class uses for creating a list of all comments for further sorting by authors.</p>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)

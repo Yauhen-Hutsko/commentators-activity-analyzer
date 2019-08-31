@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class PageAnalyzer {
+public class AppEntryPoint {
     public static final String GET_ALL_COMMENTS_REQUEST = "https://comments.api.onliner.by/news/tech.post/414510/comments?limit=99999";
     private static final String FILE_PATH = "https://tech.onliner.by/2019/02/20/muzykant-v-it";
     private static final String FILE_PATH_2 = "https://people.onliner.by/2018/12/07/dating-2";

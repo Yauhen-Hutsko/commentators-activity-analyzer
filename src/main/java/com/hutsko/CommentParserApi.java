@@ -20,5 +20,5 @@ public interface CommentParserApi {
 
     User getWorstUser();
 
-    List<Comment> findCommentByWords(String phrase);
+    List<Comment> findCommentsByText(String phrase);
 }

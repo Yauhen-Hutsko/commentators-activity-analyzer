@@ -17,9 +17,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-
 public class OnlinerCommentsLoader {
-
     private static final int QUANTITY_OF_LAST_COMMENTS = 99999;
     private String pageUrl;
     private String title;
@@ -27,6 +25,14 @@ public class OnlinerCommentsLoader {
 
     OnlinerCommentsLoader(String pageUrl) {
         this.pageUrl = pageUrl;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public LocalDateTime getCreated() {
+        return created;
     }
 
     //TODO: make this method public API and make methods below private. Tests?
@@ -68,14 +74,5 @@ public class OnlinerCommentsLoader {
         String creationDate = document.getElementsByAttributeValue("name", "article:published_time").first().attr("content");
         this.created = LocalDateTime.parse(creationDate, DateTimeFormatter.ofPattern(
                 "dd MMMM yyyy H:mm", Locale.US).withZone(ZoneId.of("Europe/Minsk")));
-
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public LocalDateTime getCreated() {
-        return created;
     }
 }

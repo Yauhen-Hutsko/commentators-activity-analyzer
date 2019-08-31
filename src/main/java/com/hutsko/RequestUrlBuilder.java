@@ -5,7 +5,7 @@ import org.jsoup.nodes.Node;
 /**
  * <p>As long as onliner's comments don't loaded on the page by default and fetched by script,
  * it necessary to get this script from source page.</p>
- * <p>{@code buildUrl(Node node, int quantity)} gets already extracted 'app' node, parses it and combine
+ * <p>{@code buildUrl(Node node, int quantity)} gets already extracted 'app' node, parses it and combine correct
  * request for getting comments </p>
  */
 class RequestUrlBuilder {

@@ -19,6 +19,9 @@ public class JsonAnalyzer {
     private final Map<Integer, User> users = new HashMap<>();
     private ObjectMapper mapper = new ObjectMapper();
 
+    /**
+     * @return all comments left by all users.
+     */
     public List<Comment> getComments() {
         return comments;
     }
@@ -48,7 +51,8 @@ public class JsonAnalyzer {
     }
 
     /**
-     * <p>Method saves the list of comment objects into the class variable {@code comments}. Use the method {@code getComments()} for getting results.</p>
+     * <p>Method saves the list of comment objects into the class variable {@code comments}. Use the method
+     * {@code getComments()} for getting all comments left by all users.</p>
      * <p>It's void because otherwise recursive invocation returns only result from the method on the top of the stack.</p>
      * <p>todo: Consider double if-condition instead of recursion because max nesting level for 'onliner' = 1</p>
      */

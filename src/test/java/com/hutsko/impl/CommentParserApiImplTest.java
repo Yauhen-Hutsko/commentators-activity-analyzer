@@ -77,11 +77,11 @@ public class CommentParserApiImplTest {
 
     @Test
     public void testFindCommentByWords(){
-        List<Comment> found = parserAPI.findCommentByWords("1");
-        List<Comment> found2 = parserAPI.findCommentByWords("empty text2");
-        List<Comment> found3 = parserAPI.findCommentByWords("empty text");
-        List<Comment> notFound = parserAPI.findCommentByWords("emty ");
-        List<Comment> notFound2 = parserAPI.findCommentByWords(" ");
+        List<Comment> found = parserAPI.findCommentsByText("1");
+        List<Comment> found2 = parserAPI.findCommentsByText("empty text2");
+        List<Comment> found3 = parserAPI.findCommentsByText("empty text");
+        List<Comment> notFound = parserAPI.findCommentsByText("emty ");
+        List<Comment> notFound2 = parserAPI.findCommentsByText(" ");
 
         Assert.assertEquals(1, found.size());
         Assert.assertEquals(1, found2.size());
