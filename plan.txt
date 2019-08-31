@@ -15,11 +15,14 @@
 + convert timestamps from String to LocalDateTime class
 - add some web representation of interesting data
 - Refactor accordingly SOLID principles
+- Add search comments by words
+- implement reading URL from console, otherwise first line from file.
 Interesting metrics
 
  1. How many days after publishing do ppl write comments
  2. How much likes\dislikes get the most active commentator
- 3. A sex of the most active commentator(and a sex of a hero of the article)
+ 3. A sex of the most active commentator(and a sex of a hero of the article). How it corresponds with a protagonist?
  4. A gap between an article issue and the first\last comment was left.
- 5. Map of daytime activity of the top commentator.
+ 5. Map of daytime activity by a commentator.
  6. Analyze difference and find deleted comments.
+ 7. Find all user activity (multi-article analysis)
