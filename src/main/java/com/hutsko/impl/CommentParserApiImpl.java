@@ -78,4 +78,27 @@ public class CommentParserApiImpl implements CommentParserApi {
         Optional<User> user = analyzer.getCommentators().values().stream().max(Comparator.comparingInt(User::getDislikeCounter));
         return user.get();
     }
+
+    /**
+     *
+     * @param phrase - word or sentence
+     * @return list of comments which contain desired phrase. If phrase is empty, then return no comments.
+     */
+    @Override
+    public List<Comment> findCommentByWords(String phrase) {
+        List<Comment> comments = analyzer.getComments();
+        List<Comment> found = new ArrayList<>();
+
+        // if phrase contains only whitespaces, then return empty list
+        if (phrase.replaceAll(" ", "").length() == 0) {
+            return found;
+        }
+        for (Comment comment : comments) {
+            if (comment.getText().contains(phrase)) {
+                found.add(comment);
+            }
+        }
+        return found;
+    }
+
 }

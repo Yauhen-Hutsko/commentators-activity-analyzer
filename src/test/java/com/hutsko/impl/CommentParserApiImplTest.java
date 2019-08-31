@@ -4,10 +4,7 @@ import com.hutsko.CommentParserApi;
 import com.hutsko.JsonAnalyzer;
 import com.hutsko.entity.Comment;
 import com.hutsko.entity.User;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -78,13 +75,28 @@ public class CommentParserApiImplTest {
         Assert.assertEquals(100, user.getDislikeCounter());
     }
 
+    @Test
+    public void testFindCommentByWords(){
+        List<Comment> found = parserAPI.findCommentByWords("1");
+        List<Comment> found2 = parserAPI.findCommentByWords("empty text2");
+        List<Comment> found3 = parserAPI.findCommentByWords("empty text");
+        List<Comment> notFound = parserAPI.findCommentByWords("emty ");
+        List<Comment> notFound2 = parserAPI.findCommentByWords(" ");
+
+        Assert.assertEquals(1, found.size());
+        Assert.assertEquals(1, found2.size());
+        Assert.assertEquals(3, found3.size());
+        Assert.assertEquals(0, notFound.size());
+        Assert.assertEquals(0, notFound2.size()); // the method shouldn't found whitespaces only
+    }
+
     private void prepareComments() {
         for (int i = 0; i < 3; i++) {
             Comment comment = new Comment();
             comment.setLikes(i * 3);
             comment.setDislikes(i * 5);
             comment.setCreated(String.format("2019-05-04T11:4%s:55.434000+03:00", i));
-            comment.setText("empty text");
+            comment.setText("empty text" + i);
             comments.add(comment);
         }
         prepareUsers(comments);
