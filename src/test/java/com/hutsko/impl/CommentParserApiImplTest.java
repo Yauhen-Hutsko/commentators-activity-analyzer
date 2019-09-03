@@ -90,6 +90,22 @@ public class CommentParserApiImplTest {
         Assert.assertEquals(0, notFound2.size()); // the method shouldn't found whitespaces only
     }
 
+    @Test
+    public void testGetUserByName(){
+        User user = parserAPI.getUserByName("Vasya");
+
+        Assert.assertEquals("Vasya", user.getName());
+        Assert.assertNotEquals("Zenya", user.getName());
+    }
+
+    @Test
+    public void testGetUserById(){
+        User user = parserAPI.getUserById(667);
+
+        Assert.assertEquals(667, user.getId());
+        Assert.assertNotEquals(837, user.getId());
+    }
+
     private void prepareComments() {
         for (int i = 0; i < 3; i++) {
             Comment comment = new Comment();
@@ -106,6 +122,7 @@ public class CommentParserApiImplTest {
         for (int i = 0; i < 3; i++) {
             User user = new User();
             user.setId(665 + i);
+            user.setName("Vasya");
             user.setLikeCounter(i * 30);
             user.setDislikeCounter(i * 50);
 //            user.addMessage(comments.get(i).getCreated(), comments.get(i).getText());

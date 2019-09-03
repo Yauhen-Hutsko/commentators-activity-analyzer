@@ -6,10 +6,7 @@ import com.hutsko.entity.Comment;
 import com.hutsko.entity.User;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class CommentParserApiImpl implements CommentParserApi {
     private JsonAnalyzer analyzer;
@@ -77,6 +74,22 @@ public class CommentParserApiImpl implements CommentParserApi {
     public final User getWorstUser() {
         Optional<User> user = analyzer.getCommentators().values().stream().max(Comparator.comparingInt(User::getDislikeCounter));
         return user.get();
+    }
+
+    /**
+     * @param name
+     * @return a user with nickname(not an ID) visible above commentary on the site.
+     */
+    public User getUserByName(String name) {
+        return analyzer.getCommentators().values().stream().filter(u -> u.getName().equals(name)).findFirst().get();
+    }
+
+    /**
+     * @param id
+     * @return a user with an ID visible in user profile on the site.
+     */
+    public User getUserById(int id) {
+        return analyzer.getCommentators().values().stream().filter(u -> (u.getId() == id) ).findFirst().get();
     }
 
     /**

@@ -16,13 +16,14 @@ import java.util.Optional;
 
 public class AppEntryPoint {
     public static final String GET_ALL_COMMENTS_REQUEST = "https://comments.api.onliner.by/news/tech.post/414510/comments?limit=99999";
-    private static final String FILE_PATH = "https://tech.onliner.by/2019/02/20/muzykant-v-it";
+    private static final String FILE_PATH = "https://tech.onliner.by/2019/01/23/ushel-v-it";
     private static final String FILE_PATH_2 = "https://people.onliner.by/2018/12/07/dating-2";
+    private static final String FILE_PATH_3 = "https://people.onliner.by/opinions/2019/01/16/mnenie-1045";
 
 
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
-        OnlinerCommentsLoader parser = new OnlinerCommentsLoader(FILE_PATH_2);
+        OnlinerCommentsLoader parser = new OnlinerCommentsLoader(FILE_PATH_3);
         Document document = parser.readHtmlPageSourceCode();
         String commentsUrl = parser.extractUrlForGettingComments(document);
         try {
@@ -41,15 +42,16 @@ public class AppEntryPoint {
             Optional<User> worstUser = Optional.of(cpa.getWorstUser());
             Optional<Comment> bestComment = Optional.of(cpa.getBestComment());
             Optional<Comment> worstComment = Optional.of(cpa.getWorstComment());
-            List<LocalDateTime> userActivity = cpa.getUserActivity(1479142);
-            String userName = userMap.get(1479142).getName();
+            List<Comment> commentList = cpa.findCommentsByText("льгот");
+//            List<LocalDateTime> userActivity = cpa.getUserActivity(1479142);
+//            String userName = userMap.get(1479142).getName();
 
-//            Optional<User> user = cpa.getBestUser();
-//            System.out.println(bestUser.get());
-//            System.out.println(worstUser.get());
-//            System.out.println(bestComment.get());
-//            System.out.println(worstComment.get());
-            System.out.format("User %1s : %2s", userName, userActivity);
+            for (Comment comment : commentList) {
+                System.out.println(comment.getText());
+                System.out.println("------------------");
+            }
+            System.out.println("Comments are found: " + commentList.size());
+//            System.out.format("User %1s : %2s", userName, userActivity);
             long endTime = System.currentTimeMillis();
             System.out.println("Time of evaluating(second): " + Duration.ofMillis(endTime - startTime));
 
