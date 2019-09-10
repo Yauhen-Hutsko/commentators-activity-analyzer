@@ -34,6 +34,8 @@ public class CommentParserApiImplTest {
 
     @After
     public void tearDown() throws Exception {
+        users = null;
+        comments = null;
     }
 
     @Test
@@ -45,6 +47,15 @@ public class CommentParserApiImplTest {
         Assert.assertEquals(expected1, timestamps.get(0));
         Assert.assertEquals(expected2, timestamps.get(1));
         Assert.assertEquals(expected3, timestamps.get(2));
+    }
+
+    @Test
+    public void testGetMostActiveUser(){
+        users.get(666).setName("Petya");
+        users.get(666).getMessages().put("not valid timestamp", "testMessage");
+        User user = parserAPI.getMostActiveUser();
+        Assert.assertEquals("Petya", user.getName());
+        Assert.assertNotEquals("Vasya", user.getName());
     }
 
     @Test

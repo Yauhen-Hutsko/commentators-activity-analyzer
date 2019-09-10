@@ -12,6 +12,8 @@ import java.util.List;
 public interface CommentParserApi {
     List<LocalDateTime> getUserActivity(int userId);
 
+    User getMostActiveUser();
+
     Comment getBestComment();
 
     Comment getWorstComment();

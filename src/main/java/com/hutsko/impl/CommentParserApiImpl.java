@@ -32,6 +32,12 @@ public class CommentParserApiImpl implements CommentParserApi {
         return timestamps;
     }
 
+    @Override
+    public User getMostActiveUser() {
+        Optional<User> user = analyzer.getCommentators().values().stream().max(Comparator.comparingInt(u -> u.getMessages().size()));
+        return user.get();
+    }
+
     /**
      * Provides a most liked {@code Comment}
      *
