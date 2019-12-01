@@ -25,4 +25,6 @@ Interesting metrics:
  4. A gap between an article issue and the first\last comment was left.
  5. Map of daytime activity by a commentator.
  6. Analyze difference and find deleted/changed comments.
- 7. Find all user activity (multi-article analysis)
+ 7. Find all user activity (multi-article analysis).
+ 8. Recognize a troll-activity under politic articles.
+ 9. Compare user comments regarding one topic at different time (e.g. seryoga).
