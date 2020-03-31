@@ -26,11 +26,12 @@ public class AppEntryPoint {
     private static final String FILE_PATH_8 = "https://tech.onliner.by/2018/12/14/medit";
     private static final String FILE_PATH_9 = "https://tech.onliner.by/2019/06/18/zhenshhiny-v-it";
     private static final String FILE_PATH_1 = "https://tech.onliner.by/2019/07/18/it-68";
+    private static final String FILE_PATH_0 = "https://tech.onliner.by/2020/03/06/money-37";
 
 
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
-        OnlinerCommentsLoader parser = new OnlinerCommentsLoader(FILE_PATH_4);
+        OnlinerCommentsLoader parser = new OnlinerCommentsLoader(FILE_PATH_0);
         Document document = parser.readHtmlPageSourceCode();
         String commentsUrl = parser.extractUrlForGettingComments(document);
         try {
@@ -39,7 +40,7 @@ public class AppEntryPoint {
             jsonAnalyzer.fillComments(commentsNode);
             jsonAnalyzer.fillCommentators();
             CommentParserApi cpa = new CommentParserApiImpl(jsonAnalyzer);
-            System.out.format("The article \"%s\" was created at %s\n", parser.getTitle(), parser.getCreated());
+            System.out.format("The article \"%s\" was created at %s%n", parser.getTitle(), parser.getCreated());
             System.out.println("Quantity of comments: " + jsonAnalyzer.getComments().size());
 
             Map<Integer, User> userMap = jsonAnalyzer.getCommentators();
@@ -49,17 +50,19 @@ public class AppEntryPoint {
             Optional<User> worstUser = Optional.of(cpa.getWorstUser());
             Optional<Comment> bestComment = Optional.of(cpa.getBestComment());
             Optional<Comment> worstComment = Optional.of(cpa.getWorstComment());
-//            List<Comment> commentList = cpa.findCommentsByText("здоровь");
-//            List<Comment> commentList = cpa.findCommentsByText("мозг");
-//            List<Comment> commentList = cpa.findCommentsByText("льгот");
-//            User user = cpa.getUserByName("1903907");
-//            List<LocalDateTime> userActivity = cpa.getUserActivity(1479142);
-//            String userName = userMap.get(1479142).getName();
+            List<Comment> commentList = cpa.findCommentsByText("кто будет");
+//            List<Comment> commentList = cpa.findCommentsByText("курсы");
+//            List<Comment> commentList = cpa.findCommentsByText("врач");
+            User user = cpa.getUserByName("Miss_3003");
+//            List<LocalDateTime> userActivity = cpa.getUserActivity(484273);
+//            String userName = userMap.get(484273).getName();
 
-//            for (Comment comment : commentList) {
-//                System.out.println(comment.getText());
-//                System.out.println("------------------");
-//            }
+            for (Comment comment : commentList) {
+                System.out.println(comment.getText());
+                System.out.println("------------------");
+            }
+
+//            System.out.println(user);
             System.out.println(cpa.getMostActiveUser());
 //            System.out.println("Comments are found: " + commentList.size());
 //            System.out.format("User %1s : %2s", userName, userActivity);
