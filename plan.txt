@@ -14,6 +14,8 @@
 + create API for working with parsed data
 + convert timestamps from String to LocalDateTime class
 + Search comments by words
++ Set up deploy to Tomcat
+- Create test-jsp
 - add some web representation of interesting data
 - Refactor accordingly SOLID principles
 - implement reading URL from console, otherwise first line from file.

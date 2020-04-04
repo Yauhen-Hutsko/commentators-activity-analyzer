@@ -10,6 +10,12 @@ import java.util.*;
 
 public class CommentParserApiImpl implements CommentParserApi {
     private JsonAnalyzer analyzer;
+    //field for test purpose
+    private String hello = "public String";
+
+    //default constructor of javaBean
+    public CommentParserApiImpl() {
+    }
 
     public CommentParserApiImpl(JsonAnalyzer analyzer) {
         this.analyzer = analyzer;
@@ -117,6 +123,14 @@ public class CommentParserApiImpl implements CommentParserApi {
             }
         }
         return found;
+    }
+
+    public String getHello() {
+        return hello;
+    }
+
+    public void setHello(String hello) {
+        this.hello = hello;
     }
 
 }

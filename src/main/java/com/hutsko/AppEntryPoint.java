@@ -27,6 +27,7 @@ public class AppEntryPoint {
     private static final String FILE_PATH_9 = "https://tech.onliner.by/2019/06/18/zhenshhiny-v-it";
     private static final String FILE_PATH_1 = "https://tech.onliner.by/2019/07/18/it-68";
     private static final String FILE_PATH_0 = "https://tech.onliner.by/2020/03/06/money-37";
+    private static final String FILE_PATH_10 = "https://people.onliner.by/2020/02/28/koronavirus-7";
 
 
     public static void main(String[] args) {
