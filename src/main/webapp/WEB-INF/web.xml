@@ -14,7 +14,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>controller</servlet-name>
-        <url-pattern>/jsp/controller</url-pattern>
+        <url-pattern>/controller</url-pattern>
     </servlet-mapping>
 
 </web-app>

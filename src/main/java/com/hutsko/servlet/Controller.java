@@ -14,7 +14,14 @@ public class Controller extends HttpServlet {
         process(req, resp);
     }
 
-    private void process(HttpServletRequest req, HttpServletResponse resp) {
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        process(req, resp);
+    }
+
+    private void process(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String url = req.getParameter("articleURL");
+        System.out.println("Read from jsp-page: " + url);
+        req.getRequestDispatcher("/index.jsp").forward(req,resp);
     }
 }
