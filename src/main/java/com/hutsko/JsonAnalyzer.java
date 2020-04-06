@@ -36,7 +36,7 @@ public class JsonAnalyzer {
      * <p>Use the method {@code getCommentators()} for getting results.</p>
      *
      */
-    void fillCommentators(){
+    public void fillCommentators(){
         //todo: better to make this method private and invoke him inside the class as a part of a preparation.
         Map<Integer, User> commentators = new HashMap<>();
         for (Comment comment : comments) {
@@ -56,7 +56,7 @@ public class JsonAnalyzer {
      * <p>It's void because otherwise recursive invocation returns only result from the method on the top of the stack.</p>
      * <p>todo: Consider double if-condition instead of recursion because max nesting level for 'onliner' = 1</p>
      */
-    void fillComments(final JsonNode node) throws IOException {
+    public void fillComments(final JsonNode node) throws IOException {
         JsonNode commentsNode = extractNodeByKey(node, COMMENTS_NODE_NAME);
 
         for (JsonNode jsonNode : commentsNode) {
