@@ -15,7 +15,9 @@
 + convert timestamps from String to LocalDateTime class
 + Search comments by words
 + Set up deploy to Tomcat
+- create pom-profile for redeploy project to tomcat
 - Create test-jsp
+- find out how json with comments changes after moderation
 - add some web representation of interesting data
 - Refactor accordingly SOLID principles
 - implement reading URL from console, otherwise first line from file.
