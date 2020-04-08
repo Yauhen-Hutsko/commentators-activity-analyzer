@@ -22,6 +22,8 @@
   		<button type="submit">Show statistic</button>
   	</form>
   	</div>
+
+  	<div></div>
   	<div>
   	    <c:if test="${not empty comments}">
   	    <h2>All comments below</h2>

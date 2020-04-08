@@ -27,4 +27,6 @@ public interface CommentParserApi {
     User getUserById(int id);
 
     List<Comment> findCommentsByText(String phrase);
+
+    List<Comment> findModifiedComments();
 }

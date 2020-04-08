@@ -7,11 +7,12 @@ import com.hutsko.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CommentParserApiImpl implements CommentParserApi {
     private JsonAnalyzer analyzer;
     //field for test purpose
-    private String hello = "public String";
+    private String hello = "private String";
 
     //default constructor of javaBean
     public CommentParserApiImpl() {
@@ -123,6 +124,14 @@ public class CommentParserApiImpl implements CommentParserApi {
             }
         }
         return found;
+    }
+
+    /**
+     * Show all modified comments
+     * @return List of comments
+     */
+    public List<Comment> findModifiedComments(){
+        return analyzer.getComments().stream().filter(comment -> comment.getUpdatedBy() != null).collect(Collectors.toList());
     }
 
     public String getHello() {

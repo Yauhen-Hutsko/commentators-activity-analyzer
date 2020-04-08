@@ -15,9 +15,10 @@
 + convert timestamps from String to LocalDateTime class
 + Search comments by words
 + Set up deploy to Tomcat
-- Create test-jsp
++ Create test-jsp
 - add some web representation of interesting data
 - Refactor accordingly SOLID principles
+- implement the check for deleted comments
 - implement reading URL from console, otherwise first line from file.
 
 Interesting metrics:
@@ -30,3 +31,11 @@ Interesting metrics:
  7. Find all user activity (multi-article analysis).
  8. Recognize a troll-activity under politic articles.
  9. Compare user comments regarding one topic at different time (e.g. seryoga).
+
+int counter = 0;
+Iterator<JsonNode> i = commentsNode.elements();
+commentsNode.elements()
+//commentsNode.findParents("text");
+//    i.next().findParents("text");
+
+{"id":212,"type":"acp_admin_user"}
