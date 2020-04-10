@@ -23,7 +23,7 @@ public class OnlinerCommentsLoader {
     private String title;
     private LocalDateTime created;
 
-    OnlinerCommentsLoader(String pageUrl) {
+    public OnlinerCommentsLoader(String pageUrl) {
         this.pageUrl = pageUrl;
     }
 
@@ -36,7 +36,7 @@ public class OnlinerCommentsLoader {
     }
 
     //TODO: make this method public API and make methods below private. Tests?
-    Document readHtmlPageSourceCode() {
+    public Document readHtmlPageSourceCode() {
         Document document = null;
         try {
             document = Jsoup.connect(pageUrl).get();
@@ -47,13 +47,13 @@ public class OnlinerCommentsLoader {
         return document;
     }
 
-    String extractUrlForGettingComments(Document document) {
+    public String extractUrlForGettingComments(Document document) {
         Element comments = document.getElementById("fast-comments");
         Node appNode = comments.getElementsByTag("app").first();
         return RequestUrlBuilder.buildUrl(appNode, QUANTITY_OF_LAST_COMMENTS);
     }
 
-    JsonNode uploadCommentsFromURL(String httpsRequestUrl) throws IOException {
+    public JsonNode uploadCommentsFromURL(String httpsRequestUrl) throws IOException {
         URL url = new URL(httpsRequestUrl);
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
         StringBuilder stringBuilder = new StringBuilder();

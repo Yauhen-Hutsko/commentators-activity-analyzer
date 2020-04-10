@@ -2,6 +2,7 @@ package com.hutsko.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 
 import java.util.Map;
 import java.util.Objects;
@@ -20,6 +21,8 @@ public class Comment {
     private int dislikes;
     private String created;
     private String text;
+    private String updatedBy;
+    private String updatedAt;
 
     public Comment() {
     }
@@ -60,6 +63,14 @@ public class Comment {
 
     public String getText() {
         return text;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
     }
 
     @JsonSetter("id")
@@ -103,6 +114,18 @@ public class Comment {
     public void setAuthorData(Map<String, String> map) {
         setAuthorId(Integer.valueOf(map.get("id")));
         setAuthorName(map.get("name"));
+    }
+
+    @JsonSetter("updated_by")
+    public void setUpdatedBy(Map<String, String> updatedBy) {
+        if (updatedBy != null) {
+            this.updatedBy = updatedBy.get("type");
+        }
+    }
+
+    @JsonSetter("updated_at")
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     @Override
