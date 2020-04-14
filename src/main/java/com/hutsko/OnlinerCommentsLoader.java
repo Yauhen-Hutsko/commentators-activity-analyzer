@@ -23,13 +23,12 @@ public class OnlinerCommentsLoader {
     private String sourceURL;
     private String title;
     private LocalDateTime created;
-    private Document HTMLDoc;
     private JsonNode commentsNode;
 
 
     public OnlinerCommentsLoader(String sourceURL) {
         this.sourceURL = sourceURL;
-        HTMLDoc = readHtmlPageSourceCode();
+        Document HTMLDoc = readHtmlPageSourceCode();
         commentsNode = uploadCommentsFromURL(extractUrlForGettingComments(HTMLDoc));
     }
 
@@ -45,8 +44,7 @@ public class OnlinerCommentsLoader {
         return commentsNode;
     }
 
-    //TODO: make this method public API and make methods below private. Tests?
-    public Document readHtmlPageSourceCode() {
+    Document readHtmlPageSourceCode() {
         Document document = null;
         try {
             document = Jsoup.connect(sourceURL).get();
@@ -57,14 +55,8 @@ public class OnlinerCommentsLoader {
         return document;
     }
 
-    public String extractUrlForGettingComments(Document document) {
-        Element comments = document.getElementById("fast-comments");
-        Node appNode = comments.getElementsByTag("app").first();
-        return RequestUrlBuilder.buildUrl(appNode, QUANTITY_OF_LAST_COMMENTS);
-    }
-
     //TODO: NPE hazard
-    public JsonNode uploadCommentsFromURL(String httpsRequestUrl) {
+    JsonNode uploadCommentsFromURL(String httpsRequestUrl) {
         StringBuilder stringBuilder = new StringBuilder();
         JsonNode commentsNode = null;
         try {
@@ -89,6 +81,12 @@ public class OnlinerCommentsLoader {
             e.printStackTrace();
         }
         return commentsNode;
+    }
+
+    private String extractUrlForGettingComments(Document document) {
+        Element comments = document.getElementById("fast-comments");
+        Node appNode = comments.getElementsByTag("app").first();
+        return RequestUrlBuilder.buildUrl(appNode, QUANTITY_OF_LAST_COMMENTS);
     }
 
     private void setMetaData(Document document) {

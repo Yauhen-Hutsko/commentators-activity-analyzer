@@ -1,9 +1,10 @@
 package com.hutsko.servlet;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.hutsko.CommentParserApi;
 import com.hutsko.JsonAnalyzer;
 import com.hutsko.OnlinerCommentsLoader;
 import com.hutsko.OnlinerJsonAnalyzer;
+import com.hutsko.impl.CommentParserApiImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -27,11 +28,11 @@ public class Controller extends HttpServlet {
     private void process(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String url = req.getParameter("articleURL");
 
+        // todo: create a factory that will validate url and create correct Parser.
         OnlinerCommentsLoader parser = new OnlinerCommentsLoader(url);
-        JsonNode commentsNode = parser.getCommentsNode();
-        JsonAnalyzer jsonAnalyzer = new OnlinerJsonAnalyzer(commentsNode);
+        JsonAnalyzer jsonAnalyzer = new OnlinerJsonAnalyzer(parser.getCommentsNode());
 
-//        CommentParserApi cpa = new CommentParserApiImpl(jsonAnalyzer);
+        CommentParserApi parserApi = new CommentParserApiImpl(jsonAnalyzer);
 
         req.setAttribute("comments", jsonAnalyzer.getComments());
         req.getRequestDispatcher("/jsp/welcome.jsp").forward(req, resp);

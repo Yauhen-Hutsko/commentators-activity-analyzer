@@ -14,13 +14,12 @@ import java.util.stream.Collectors;
 
 public class CommentParserApiImpl implements CommentParserApi {
     private JsonAnalyzer analyzer;
-    //field for test purpose
+    //TODO: field for test purpose. delete after getting charts in browser.
     private String hello = "private String";
 
-    //default constructor of javaBean
+    //TODO: default constructor of javaBean. Is that necessary?
     public CommentParserApiImpl() {
     }
-
 
     public CommentParserApiImpl(JsonAnalyzer analyzer) {
         this.analyzer = analyzer;
