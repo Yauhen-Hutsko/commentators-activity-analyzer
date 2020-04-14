@@ -3,6 +3,7 @@ package com.hutsko.servlet;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hutsko.JsonAnalyzer;
 import com.hutsko.OnlinerCommentsLoader;
+import com.hutsko.OnlinerJsonAnalyzer;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -28,7 +29,7 @@ public class Controller extends HttpServlet {
 
         OnlinerCommentsLoader parser = new OnlinerCommentsLoader(url);
         JsonNode commentsNode = parser.getCommentsNode();
-        JsonAnalyzer jsonAnalyzer = new JsonAnalyzer(commentsNode);
+        JsonAnalyzer jsonAnalyzer = new OnlinerJsonAnalyzer(commentsNode);
 
 //        CommentParserApi cpa = new CommentParserApiImpl(jsonAnalyzer);
 

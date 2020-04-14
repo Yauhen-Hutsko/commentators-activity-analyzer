@@ -6,7 +6,10 @@ import com.hutsko.entity.Comment;
 import com.hutsko.entity.User;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CommentParserApiImpl implements CommentParserApi {
@@ -17,6 +20,7 @@ public class CommentParserApiImpl implements CommentParserApi {
     //default constructor of javaBean
     public CommentParserApiImpl() {
     }
+
 
     public CommentParserApiImpl(JsonAnalyzer analyzer) {
         this.analyzer = analyzer;
@@ -102,7 +106,7 @@ public class CommentParserApiImpl implements CommentParserApi {
      * @return a user with an ID visible in user profile on the site.
      */
     public User getUserById(int id) {
-        return analyzer.getCommentators().values().stream().filter(u -> (u.getId() == id) ).findFirst().get();
+        return analyzer.getCommentators().values().stream().filter(u -> (u.getId() == id)).findFirst().get();
     }
 
     /**
@@ -128,9 +132,10 @@ public class CommentParserApiImpl implements CommentParserApi {
 
     /**
      * Show all modified comments
+     *
      * @return List of comments
      */
-    public List<Comment> findModifiedComments(){
+    public List<Comment> findModifiedComments() {
         return analyzer.getComments().stream().filter(comment -> comment.getUpdatedBy() != null).collect(Collectors.toList());
     }
 

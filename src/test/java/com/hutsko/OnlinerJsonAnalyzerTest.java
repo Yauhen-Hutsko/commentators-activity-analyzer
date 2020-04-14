@@ -14,11 +14,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public class JsonAnalyzerTest {
+public class OnlinerJsonAnalyzerTest {
     private static final String JSON_TEST_FILE = "src/test/resource/test.json";
     private static final String JSON_COMMENT_FILE = "src/test/resource/oneComment.json";
     private static final String COMMENT_TEXT = "\u0418 \u043d\u0430\u043a\u0430\u043a\u043e\u0435 \u0430\u0439\u0442\u044b \u043d\u0435 \u043d\u0443\u0436\u043d\u043e...";
-    private JsonAnalyzer analyzer;
+    private OnlinerJsonAnalyzer analyzer;
     private JsonNode inputJson;
     private JsonNode inputJsonWithReply;
 
@@ -27,7 +27,7 @@ public class JsonAnalyzerTest {
         ObjectMapper mapper = new ObjectMapper();
         inputJson = mapper.readTree(new File(JSON_COMMENT_FILE));
         inputJsonWithReply = mapper.readTree(new File(JSON_TEST_FILE));
-        analyzer = new JsonAnalyzer(inputJson);
+        analyzer = new OnlinerJsonAnalyzer(inputJson);
     }
 
     @After
@@ -37,7 +37,7 @@ public class JsonAnalyzerTest {
 
     @Test
     public void testFillComments() throws IOException {
-        analyzer = new JsonAnalyzer(inputJsonWithReply);
+        analyzer = new OnlinerJsonAnalyzer(inputJsonWithReply);
         Assert.assertEquals(3, analyzer.getComments().size());
 
     }
@@ -54,7 +54,7 @@ public class JsonAnalyzerTest {
 
     @Test
     public void testGetAllUsers() throws IOException {
-        analyzer = new JsonAnalyzer(inputJsonWithReply);
+        analyzer = new OnlinerJsonAnalyzer(inputJsonWithReply);
         Map<Integer, User> commentators = analyzer.getCommentators();
         int usersInCollection = commentators.size();
         int numberOfComments = commentators.get(1322951).getMessages().size();
