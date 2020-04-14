@@ -11,6 +11,7 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -19,12 +20,17 @@ import java.util.Locale;
 
 public class OnlinerCommentsLoader {
     private static final int QUANTITY_OF_LAST_COMMENTS = 99999;
-    private String pageUrl;
+    private String sourceURL;
     private String title;
     private LocalDateTime created;
+    private Document HTMLDoc;
+    private JsonNode commentsNode;
 
-    public OnlinerCommentsLoader(String pageUrl) {
-        this.pageUrl = pageUrl;
+
+    public OnlinerCommentsLoader(String sourceURL) {
+        this.sourceURL = sourceURL;
+        HTMLDoc = readHtmlPageSourceCode();
+        commentsNode = uploadCommentsFromURL(extractUrlForGettingComments(HTMLDoc));
     }
 
     public String getTitle() {
@@ -35,11 +41,15 @@ public class OnlinerCommentsLoader {
         return created;
     }
 
+    public JsonNode getCommentsNode() {
+        return commentsNode;
+    }
+
     //TODO: make this method public API and make methods below private. Tests?
     public Document readHtmlPageSourceCode() {
         Document document = null;
         try {
-            document = Jsoup.connect(pageUrl).get();
+            document = Jsoup.connect(sourceURL).get();
             setMetaData(document);
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -53,20 +63,32 @@ public class OnlinerCommentsLoader {
         return RequestUrlBuilder.buildUrl(appNode, QUANTITY_OF_LAST_COMMENTS);
     }
 
-    public JsonNode uploadCommentsFromURL(String httpsRequestUrl) throws IOException {
-        URL url = new URL(httpsRequestUrl);
-        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+    //TODO: NPE hazard
+    public JsonNode uploadCommentsFromURL(String httpsRequestUrl) {
         StringBuilder stringBuilder = new StringBuilder();
-        String inputLine = "";
-        if (connection != null) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            while ((inputLine = reader.readLine()) != null) {
-                stringBuilder.append(inputLine);
+        JsonNode commentsNode = null;
+        try {
+            URL url = new URL(httpsRequestUrl);
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            String inputLine = "";
+            if (connection != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                while ((inputLine = reader.readLine()) != null) {
+                    stringBuilder.append(inputLine);
+                }
+                reader.close();
             }
-            reader.close();
+            ObjectMapper mapper = new ObjectMapper();
+            commentsNode = mapper.readTree(stringBuilder.toString());
+        } catch (MalformedURLException e) {
+            //todo: add logging
+            System.err.println("Can't parse the URL string");
+            e.printStackTrace();
+        } catch (IOException e) {
+            //todo: add logging
+            e.printStackTrace();
         }
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readTree(stringBuilder.toString());
+        return commentsNode;
     }
 
     private void setMetaData(Document document) {

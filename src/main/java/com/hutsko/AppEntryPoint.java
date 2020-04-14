@@ -33,47 +33,43 @@ public class AppEntryPoint {
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
         OnlinerCommentsLoader parser = new OnlinerCommentsLoader(FILE_PATH_0);
-        Document document = parser.readHtmlPageSourceCode();
-        String commentsUrl = parser.extractUrlForGettingComments(document);
-        try {
-            JsonNode commentsNode = parser.uploadCommentsFromURL(commentsUrl);
-            JsonAnalyzer jsonAnalyzer = new JsonAnalyzer();
-            jsonAnalyzer.fillComments(commentsNode);
-            jsonAnalyzer.fillCommentators();
-            CommentParserApi cpa = new CommentParserApiImpl(jsonAnalyzer);
-            System.out.format("The article \"%s\" was created at %s%n", parser.getTitle(), parser.getCreated());
-            System.out.println("Quantity of comments: " + jsonAnalyzer.getComments().size());
-            System.out.println(cpa.findModifiedComments().size() + " of them was modified");
+//        Document document = parser.readHtmlPageSourceCode();
+//        String commentsUrl = parser.extractUrlForGettingComments(document);
+        JsonNode commentsNode = parser.getCommentsNode();
+        JsonAnalyzer jsonAnalyzer = new JsonAnalyzer(commentsNode);
+//            jsonAnalyzer.fillComments(commentsNode);
+//            jsonAnalyzer.fillCommentators();
+        CommentParserApi cpa = new CommentParserApiImpl(jsonAnalyzer);
+        System.out.format("The article \"%s\" was created at %s%n", parser.getTitle(), parser.getCreated());
+        System.out.println("Quantity of comments: " + jsonAnalyzer.getComments().size());
+        System.out.println(cpa.findModifiedComments().size() + " of them was modified");
 
-            Map<Integer, User> userMap = jsonAnalyzer.getCommentators();
-            System.out.println("Unique users: " + userMap.size());
+        Map<Integer, User> userMap = jsonAnalyzer.getCommentators();
+        System.out.println("Unique users: " + userMap.size());
 
-            Optional<User> bestUser = Optional.of(cpa.getBestUser());
-            Optional<User> worstUser = Optional.of(cpa.getWorstUser());
-            Optional<Comment> bestComment = Optional.of(cpa.getBestComment());
-            Optional<Comment> worstComment = Optional.of(cpa.getWorstComment());
-            List<Comment> commentList = cpa.findCommentsByText("Ну что, Александр Григорьевич");
+        Optional<User> bestUser = Optional.of(cpa.getBestUser());
+        Optional<User> worstUser = Optional.of(cpa.getWorstUser());
+        Optional<Comment> bestComment = Optional.of(cpa.getBestComment());
+        Optional<Comment> worstComment = Optional.of(cpa.getWorstComment());
+        List<Comment> commentList = cpa.findCommentsByText("Ну что, Александр Григорьевич");
 //            List<Comment> commentList = cpa.findCommentsByText("курсы");
 //            List<Comment> commentList = cpa.findCommentsByText("врач");
 //            User user = cpa.getUserByName("Miss_3003");
 //            List<LocalDateTime> userActivity = cpa.getUserActivity(484273);
 //            String userName = userMap.get(484273).getName();
 
-            for (Comment comment : commentList) {
-                System.out.println(comment.getText());
-                System.out.println("------------------");
-            }
+        for (Comment comment : commentList) {
+            System.out.println(comment.getText());
+            System.out.println("------------------");
+        }
 
 //            System.out.println(user);
-            System.out.println(cpa.getMostActiveUser());
-            System.out.println("Comments are found: " + commentList.size());
+        System.out.println(cpa.getMostActiveUser());
+        System.out.println("Comments are found: " + commentList.size());
 //            System.out.format("User %1s : %2s", userName, userActivity);
-            long endTime = System.currentTimeMillis();
-            System.out.println("Time of evaluating(second): " + Duration.ofMillis(endTime - startTime));
+        long endTime = System.currentTimeMillis();
+        System.out.println("Time of evaluating(second): " + Duration.ofMillis(endTime - startTime));
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**

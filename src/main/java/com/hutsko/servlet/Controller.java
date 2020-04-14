@@ -34,7 +34,7 @@ public class Controller extends HttpServlet {
         String commentsUrl = parser.extractUrlForGettingComments(document);
 
         JsonNode commentsNode = parser.uploadCommentsFromURL(commentsUrl);
-        JsonAnalyzer jsonAnalyzer = new JsonAnalyzer();
+        JsonAnalyzer jsonAnalyzer = new JsonAnalyzer(commentsNode);
         jsonAnalyzer.fillComments(commentsNode);
 //        jsonAnalyzer.fillCommentators();
 //        CommentParserApi cpa = new CommentParserApiImpl(jsonAnalyzer);

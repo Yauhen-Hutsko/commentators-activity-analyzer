@@ -27,7 +27,7 @@ public class JsonAnalyzerTest {
         ObjectMapper mapper = new ObjectMapper();
         inputJson = mapper.readTree(new File(JSON_COMMENT_FILE));
         inputJsonWithReply = mapper.readTree(new File(JSON_TEST_FILE));
-        analyzer = new JsonAnalyzer();
+        analyzer = new JsonAnalyzer(inputJson);
     }
 
     @After
@@ -37,7 +37,7 @@ public class JsonAnalyzerTest {
 
     @Test
     public void testFillComments() throws IOException {
-        analyzer.fillComments(inputJsonWithReply);
+        analyzer = new JsonAnalyzer(inputJsonWithReply);
         Assert.assertEquals(3, analyzer.getComments().size());
 
     }
@@ -54,8 +54,7 @@ public class JsonAnalyzerTest {
 
     @Test
     public void testGetAllUsers() throws IOException {
-        analyzer.fillComments(inputJsonWithReply);
-        analyzer.fillCommentators();
+        analyzer = new JsonAnalyzer(inputJsonWithReply);
         Map<Integer, User> commentators = analyzer.getCommentators();
         int usersInCollection = commentators.size();
         int numberOfComments = commentators.get(1322951).getMessages().size();

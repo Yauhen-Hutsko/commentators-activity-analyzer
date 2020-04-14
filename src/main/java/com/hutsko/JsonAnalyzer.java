@@ -19,6 +19,11 @@ public class JsonAnalyzer {
     private final Map<Integer, User> users = new HashMap<>();
     private ObjectMapper mapper = new ObjectMapper();
 
+    public JsonAnalyzer(JsonNode jsonNode) {
+        fillComments(jsonNode);
+        fillCommentators();
+    }
+
     /**
      * @return all comments left by all users.
      */
@@ -36,7 +41,7 @@ public class JsonAnalyzer {
      * <p>Use the method {@code getCommentators()} for getting results.</p>
      *
      */
-    public void fillCommentators(){
+    private void fillCommentators(){
         //todo: better to make this method private and invoke him inside the class as a part of a preparation.
         Map<Integer, User> commentators = new HashMap<>();
         for (Comment comment : comments) {
@@ -56,7 +61,7 @@ public class JsonAnalyzer {
      * <p>It's void because otherwise recursive invocation returns only result from the method on the top of the stack.</p>
      * <p>todo: Consider double if-condition instead of recursion because max nesting level for 'onliner' = 1</p>
      */
-    public void fillComments(final JsonNode node) throws IOException {
+    public void fillComments(final JsonNode node) {
         JsonNode commentsNode = extractNodeByKey(node, COMMENTS_NODE_NAME);
 
         for (JsonNode jsonNode : commentsNode) {
@@ -68,12 +73,18 @@ public class JsonAnalyzer {
         comments.addAll(extractCommentsFromJsonToObject(commentsNode));
     }
 
-    List<Comment> extractCommentsFromJsonToObject(JsonNode inputNode) throws IOException {
+    List<Comment> extractCommentsFromJsonToObject(JsonNode inputNode) {
         List<Comment> comments = new ArrayList<>();
         JsonNode commentsNode = extractNodeByKey(inputNode, COMMENTS_NODE_NAME);
 
         for (JsonNode node : commentsNode) {
-            Comment comment = mapper.readValue(node.toString(), Comment.class);
+            Comment comment = null;
+            try {
+                comment = mapper.readValue(node.toString(), Comment.class);
+            } catch (IOException e) {
+                //TODO: add logging
+                e.printStackTrace();
+            }
             comments.add(comment);
         }
         return comments;
