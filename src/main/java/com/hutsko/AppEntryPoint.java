@@ -1,15 +1,11 @@
 package com.hutsko;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.hutsko.entity.Comment;
 import com.hutsko.entity.User;
 import com.hutsko.impl.CommentParserApiImpl;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.io.IOException;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,14 +28,11 @@ public class AppEntryPoint {
 
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
+
         OnlinerCommentsLoader parser = new OnlinerCommentsLoader(FILE_PATH_0);
-//        Document document = parser.readHtmlPageSourceCode();
-//        String commentsUrl = parser.extractUrlForGettingComments(document);
-        JsonNode commentsNode = parser.getCommentsNode();
-        JsonAnalyzer jsonAnalyzer = new JsonAnalyzer(commentsNode);
-//            jsonAnalyzer.fillComments(commentsNode);
-//            jsonAnalyzer.fillCommentators();
+        JsonAnalyzer jsonAnalyzer = new JsonAnalyzer(parser.getCommentsNode());
         CommentParserApi cpa = new CommentParserApiImpl(jsonAnalyzer);
+
         System.out.format("The article \"%s\" was created at %s%n", parser.getTitle(), parser.getCreated());
         System.out.println("Quantity of comments: " + jsonAnalyzer.getComments().size());
         System.out.println(cpa.findModifiedComments().size() + " of them was modified");

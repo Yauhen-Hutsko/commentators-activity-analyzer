@@ -42,7 +42,6 @@ public class JsonAnalyzer {
      *
      */
     private void fillCommentators(){
-        //todo: better to make this method private and invoke him inside the class as a part of a preparation.
         Map<Integer, User> commentators = new HashMap<>();
         for (Comment comment : comments) {
             if (commentators.containsKey(comment.getAuthorId())) {
@@ -59,9 +58,9 @@ public class JsonAnalyzer {
      * <p>Method saves the list of comment objects into the class variable {@code comments}. Use the method
      * {@code getComments()} for getting all comments left by all users.</p>
      * <p>It's void because otherwise recursive invocation returns only result from the method on the top of the stack.</p>
-     * <p>todo: Consider double if-condition instead of recursion because max nesting level for 'onliner' = 1</p>
      */
-    public void fillComments(final JsonNode node) {
+    //todo: Consider double if-condition instead of recursion because max nesting level for 'onliner' = 1
+    private void fillComments(final JsonNode node) {
         JsonNode commentsNode = extractNodeByKey(node, COMMENTS_NODE_NAME);
 
         for (JsonNode jsonNode : commentsNode) {
@@ -93,9 +92,9 @@ public class JsonAnalyzer {
     /**
      * It adds Comment into User.  New user will be created if <code>user</code> param is null.
      * Otherwise comment will be added to provided user.
-     * @param comment
-     * @param user
-     * @return
+     * @param comment stores data obtained from json comment-node
+     * @param user is an author of the comment
+     * @return User object that contains name, id, reputation and all his messages.
      */
     private User createUserFromComment(final Comment comment, User user) {
         if (user == null) {
