@@ -20,7 +20,11 @@
 - find out how json with comments changes after moderation
 - add some web representation of interesting data
 - Refactor accordingly SOLID principles
-- implement the check for deleted comments
+- implement the class for checking deleted comments
+    - turn on logging
+    - write a message to logs by schedule
+    - save comments to file
+    - upload file to memory and update it with difference
 - implement reading URL from console, otherwise first line from file.
 
 Interesting metrics:
