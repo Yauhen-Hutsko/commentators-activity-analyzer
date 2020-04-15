@@ -29,7 +29,7 @@ public class AppEntryPoint {
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
 
-        OnlinerCommentsLoader parser = new OnlinerCommentsLoader(FILE_PATH_0);
+        OnlinerArticleLoader parser = new OnlinerArticleLoader(FILE_PATH_0);
         JsonAnalyzer analyzer = new OnlinerJsonAnalyzer(parser.getCommentsNode());
         CommentParserApi cpa = new CommentParserApiImpl(analyzer);
 

@@ -18,7 +18,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-public class OnlinerCommentsLoader {
+public class OnlinerArticleLoader implements ArticleLoader{
     private static final int QUANTITY_OF_LAST_COMMENTS = 99999;
     private String sourceURL;
     private String title;
@@ -26,7 +26,7 @@ public class OnlinerCommentsLoader {
     private JsonNode commentsNode;
 
 
-    public OnlinerCommentsLoader(String sourceURL) {
+    public OnlinerArticleLoader(String sourceURL) {
         this.sourceURL = sourceURL;
         Document HTMLDoc = readHtmlPageSourceCode();
         commentsNode = uploadCommentsFromURL(extractUrlForGettingComments(HTMLDoc));
@@ -56,7 +56,7 @@ public class OnlinerCommentsLoader {
     }
 
     //TODO: NPE hazard
-    JsonNode uploadCommentsFromURL(String httpsRequestUrl) {
+    public JsonNode uploadCommentsFromURL(String httpsRequestUrl) {
         StringBuilder stringBuilder = new StringBuilder();
         JsonNode commentsNode = null;
         try {

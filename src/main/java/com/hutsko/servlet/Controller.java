@@ -2,7 +2,7 @@ package com.hutsko.servlet;
 
 import com.hutsko.CommentParserApi;
 import com.hutsko.JsonAnalyzer;
-import com.hutsko.OnlinerCommentsLoader;
+import com.hutsko.OnlinerArticleLoader;
 import com.hutsko.OnlinerJsonAnalyzer;
 import com.hutsko.impl.CommentParserApiImpl;
 
@@ -29,7 +29,7 @@ public class Controller extends HttpServlet {
         String url = req.getParameter("articleURL");
 
         // todo: create a factory that will validate url and create correct Parser.
-        OnlinerCommentsLoader parser = new OnlinerCommentsLoader(url);
+        OnlinerArticleLoader parser = new OnlinerArticleLoader(url);
         JsonAnalyzer jsonAnalyzer = new OnlinerJsonAnalyzer(parser.getCommentsNode());
 
         CommentParserApi parserApi = new CommentParserApiImpl(jsonAnalyzer);
