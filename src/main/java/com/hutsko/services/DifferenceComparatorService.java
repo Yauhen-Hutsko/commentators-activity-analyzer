@@ -2,13 +2,26 @@ package com.hutsko.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hutsko.ArticleLoader;
 import com.hutsko.ArticleLoaderFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
+/**
+ * Service description:
+ * 1. At initialization its fetch comments from an article and cache them.
+ * 2. After that on schedule, comments fetched again and comparing with cached ones.
+ * If cached comment wasn't found in source then it saved in a list.
+ * Once, all source comments processed, the list stored in DB(currently it's a file on hard drive).
+ * 3. Source json becomes new cache.
+ * 4. Step 2 is repeated.
+ *
+ * @version 0.9
+ * note: TODO:#Mustithread - every article has its own thread
+ */
 public class DifferenceComparatorService {
 
     private String sourceURL;
@@ -21,30 +34,63 @@ public class DifferenceComparatorService {
         sourceURL = url;
         mapper = new ObjectMapper();
         article = ArticleLoaderFactory.getInstance(url);
-        sourceJson = article.getCommentsNode();
+        cachedJson = article.getCommentsNode();
     }
 
-    //it should be the method that invoked on schedule
+    // separate diff
     void process() {
-        // 1. getting source-json on schedule
         sourceJson = article.getCommentsNode();
-        // 2. create cache-json
-        // separate diff
-        cachedJson = (cachedJson == null) ? sourceJson : separateDiffComments();
-        ObjectNode storage = mapper.createObjectNode();
-
-        // 3. open connection to DB(txt.file) and upload json for rewriting
-        // 3.1 check if sourceJSON and cachedJSON has the difference
-        File db = new File(sourceURL.substring(sourceURL.lastIndexOf('/')+1));
-
-        // 4. write cache to DB
-        // 5. close connection
+        separateDiffComments(sourceJson, cachedJson);
     }
 
-    private JsonNode separateDiffComments() {
-        ArrayNode storage = mapper.createArrayNode();
+    private void separateDiffComments(JsonNode sourceJson, JsonNode cachedJson) {
 
-        return null;
+        ArrayList<String> sourceCommentsId = new ArrayList<>();
+        ObjectNode rootNode = mapper.createObjectNode();
+
+        for (JsonNode entry : sourceJson) {
+            sourceCommentsId.add(entry.get("id").toString());
+        }
+        // 5.1 check if sourceJSON and cachedJSON has the difference
+        for (JsonNode entry : cachedJson) {
+            if (!sourceCommentsId.contains(entry.get("id").toString())) {
+                rootNode.set(entry.get("id").toString(), entry);
+            }
+        }
+        if (rootNode.size() > 0) {
+            stashComments(rootNode);
+        }
+    }
+
+    private void stashComments(ObjectNode deletedComments) {
+        // 4. open connection to DB(txt.file) and upload json for rewriting
+        // Use name of the article from URL for file naming
+        File f = new File(sourceURL.substring(sourceURL.lastIndexOf('/') + 1));
+        if (!f.exists()) {
+            try {
+                f.createNewFile();
+                mapper.writeValue(f, deletedComments);
+            } catch (IOException e) {
+                //TODO: add logging
+                e.printStackTrace();
+            }
+        }
+        ObjectNode storage = null;
+        try {
+            storage = (ObjectNode) mapper.readTree(f);
+        } catch (IOException e) {
+            //TODO: add logging
+            e.printStackTrace();
+        }
+        storage.setAll(deletedComments);
+        // 5. write cache to DB
+        // 6. close connection
+        try {
+            mapper.writeValue(f, storage);
+        } catch (IOException e) {
+            //TODO: add logging
+            e.printStackTrace();
+        }
     }
 }
 
