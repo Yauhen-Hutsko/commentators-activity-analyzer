@@ -30,11 +30,11 @@ public class AppEntryPoint {
         long startTime = System.currentTimeMillis();
 
         OnlinerArticleLoader parser = new OnlinerArticleLoader(FILE_PATH_0);
-        JsonAnalyzer analyzer = new OnlinerJsonAnalyzer(parser.getCommentsNode());
+        JsonAnalyzer analyzer = new OnlinerJsonAnalyzer(parser.getCommentsRootNode());
         CommentParserApi cpa = new CommentParserApiImpl(analyzer);
 
         System.out.format("The article \"%s\" was created at %s%n", parser.getTitle(), parser.getCreated());
-        System.out.println("Quantity of comments: " + analyzer.getComments().size());
+        System.out.println("Quantity of comments: " + analyzer.getTotalAfterModeration());
         System.out.println(cpa.findModifiedComments().size() + " of them was modified");
 
         Map<Integer, User> userMap = analyzer.getCommentators();

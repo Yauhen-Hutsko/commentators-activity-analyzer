@@ -34,16 +34,19 @@ public class DifferenceComparatorService {
         sourceURL = url;
         mapper = new ObjectMapper();
         article = ArticleLoaderFactory.getInstance(url);
-        cachedJson = article.getCommentsNode();
+        cachedJson = article.getCommentsRootNode().get("comments");
     }
 
     // separate diff
     void process() {
-        sourceJson = article.getCommentsNode();
-        separateDiffComments(sourceJson, cachedJson);
+        sourceJson = article.getCommentsRootNode().get("comments");
+        ObjectNode difference = separateDiffComments(sourceJson, cachedJson);
+        if (difference.size() > 0) {
+            stashComments(difference);
+        }
     }
 
-    private void separateDiffComments(JsonNode sourceJson, JsonNode cachedJson) {
+    ObjectNode separateDiffComments(JsonNode sourceJson, JsonNode cachedJson) {
 
         ArrayList<String> sourceCommentsId = new ArrayList<>();
         ObjectNode rootNode = mapper.createObjectNode();
@@ -57,12 +60,10 @@ public class DifferenceComparatorService {
                 rootNode.set(entry.get("id").toString(), entry);
             }
         }
-        if (rootNode.size() > 0) {
-            stashComments(rootNode);
-        }
+        return rootNode;
     }
 
-    private void stashComments(ObjectNode deletedComments) {
+    void stashComments(ObjectNode deletedComments) {
         // 4. open connection to DB(txt.file) and upload json for rewriting
         // Use name of the article from URL for file naming
         File f = new File(sourceURL.substring(sourceURL.lastIndexOf('/') + 1));

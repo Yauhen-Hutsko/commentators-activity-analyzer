@@ -23,13 +23,14 @@ public class OnlinerArticleLoader implements ArticleLoader{
     private String sourceURL;
     private String title;
     private LocalDateTime created;
-    private JsonNode commentsNode;
+    private JsonNode commentsRootNode;
 
 
     public OnlinerArticleLoader(String sourceURL) {
         this.sourceURL = sourceURL;
         Document HTMLDoc = readHtmlPageSourceCode();
-        commentsNode = uploadCommentsFromURL(extractUrlForGettingComments(HTMLDoc));
+        setMetaData(HTMLDoc);
+        commentsRootNode = uploadFullJsonFromURL(extractUrlForGettingComments(HTMLDoc));
     }
 
     public String getTitle() {
@@ -40,15 +41,14 @@ public class OnlinerArticleLoader implements ArticleLoader{
         return created;
     }
 
-    public JsonNode getCommentsNode() {
-        return commentsNode;
+    public JsonNode getCommentsRootNode() {
+        return commentsRootNode;
     }
 
     Document readHtmlPageSourceCode() {
         Document document = null;
         try {
             document = Jsoup.connect(sourceURL).get();
-            setMetaData(document);
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
@@ -56,7 +56,7 @@ public class OnlinerArticleLoader implements ArticleLoader{
     }
 
     //TODO: NPE hazard
-    public JsonNode uploadCommentsFromURL(String httpsRequestUrl) {
+    public JsonNode uploadFullJsonFromURL(String httpsRequestUrl) {
         StringBuilder stringBuilder = new StringBuilder();
         JsonNode commentsNode = null;
         try {

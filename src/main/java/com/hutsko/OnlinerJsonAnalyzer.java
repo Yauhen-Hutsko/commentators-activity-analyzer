@@ -21,10 +21,12 @@ public class OnlinerJsonAnalyzer implements JsonAnalyzer {
     private final List<Comment> comments = new ArrayList<>();
     private final Map<Integer, User> users = new HashMap<>();
     private ObjectMapper mapper = new ObjectMapper();
+    private int totalBeforeModeration;
 
     public OnlinerJsonAnalyzer(JsonNode jsonNode) {
         fillComments(jsonNode);
         fillCommentators();
+        totalBeforeModeration = jsonNode.get("total").asInt();
     }
 
     /**
@@ -36,6 +38,33 @@ public class OnlinerJsonAnalyzer implements JsonAnalyzer {
 
     public Map<Integer, User> getCommentators() {
         return users;
+    }
+
+    public int getTotalBeforeModeration() {
+        return totalBeforeModeration;
+    }
+
+    public int getTotalAfterModeration() {
+        return comments.size();
+    }
+
+
+    /**
+     * <p>Method saves the list of comment objects into the class variable {@code comments}. Use the method
+     * {@code getComments()} for getting all comments left by all users.</p>
+     * <p>It's void because otherwise recursive invocation returns only result from the method on the top of the stack.</p>
+     */
+    //todo: Consider double if-condition instead of recursion because max nesting level for 'onliner' = 1
+    public void fillComments(final JsonNode node) {
+        JsonNode commentsNode = extractNodeByKey(node, COMMENTS_NODE_NAME);
+
+        for (JsonNode jsonNode : commentsNode) {
+            if (jsonNode.has(SUBCOMMENTS_NODE_NAME) && jsonNode.get(SUBCOMMENTS_NODE_NAME).size() != 0) {
+                //recursive mapping of subcomments
+                fillComments(jsonNode.get(SUBCOMMENTS_NODE_NAME));
+            }
+        }
+        comments.addAll(extractCommentsFromJsonToObject(commentsNode));
     }
 
     /**
@@ -54,24 +83,6 @@ public class OnlinerJsonAnalyzer implements JsonAnalyzer {
             }
         }
         users.putAll(commentators);
-    }
-
-    /**
-     * <p>Method saves the list of comment objects into the class variable {@code comments}. Use the method
-     * {@code getComments()} for getting all comments left by all users.</p>
-     * <p>It's void because otherwise recursive invocation returns only result from the method on the top of the stack.</p>
-     */
-    //todo: Consider double if-condition instead of recursion because max nesting level for 'onliner' = 1
-    public void fillComments(final JsonNode node) {
-        JsonNode commentsNode = extractNodeByKey(node, COMMENTS_NODE_NAME);
-
-        for (JsonNode jsonNode : commentsNode) {
-            if (jsonNode.has(SUBCOMMENTS_NODE_NAME) && jsonNode.get(SUBCOMMENTS_NODE_NAME).size() != 0) {
-                //recursive mapping of subcomments
-                fillComments(jsonNode.get(SUBCOMMENTS_NODE_NAME));
-            }
-        }
-        comments.addAll(extractCommentsFromJsonToObject(commentsNode));
     }
 
     List<Comment> extractCommentsFromJsonToObject(JsonNode inputNode) {

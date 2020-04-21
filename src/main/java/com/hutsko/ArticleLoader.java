@@ -9,7 +9,7 @@ public interface ArticleLoader {
 
     LocalDateTime getCreated();
 
-    JsonNode getCommentsNode();
+    JsonNode getCommentsRootNode();
 
-    JsonNode uploadCommentsFromURL(String httpsRequestUrl);
+    JsonNode uploadFullJsonFromURL(String httpsRequestUrl);
 }

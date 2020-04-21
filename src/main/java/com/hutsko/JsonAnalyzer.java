@@ -16,4 +16,7 @@ public interface JsonAnalyzer {
 
     Map<Integer, User> getCommentators();
 
+    int getTotalBeforeModeration();
+
+    int getTotalAfterModeration();
 }

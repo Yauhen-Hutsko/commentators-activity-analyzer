@@ -30,7 +30,7 @@ public class Controller extends HttpServlet {
 
         // todo: create a factory that will validate url and create correct Parser.
         OnlinerArticleLoader parser = new OnlinerArticleLoader(url);
-        JsonAnalyzer jsonAnalyzer = new OnlinerJsonAnalyzer(parser.getCommentsNode());
+        JsonAnalyzer jsonAnalyzer = new OnlinerJsonAnalyzer(parser.getCommentsRootNode());
 
         CommentParserApi parserApi = new CommentParserApiImpl(jsonAnalyzer);
 
