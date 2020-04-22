@@ -2,6 +2,7 @@ package com.hutsko;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hutsko.entity.Comment;
 import com.hutsko.entity.User;
 

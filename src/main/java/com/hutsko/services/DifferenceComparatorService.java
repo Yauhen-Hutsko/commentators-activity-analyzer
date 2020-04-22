@@ -47,7 +47,9 @@ public class DifferenceComparatorService {
     }
 
     ObjectNode separateDiffComments(JsonNode sourceJson, JsonNode cachedJson) {
-
+        if (!cachedJson.elements().hasNext()) {
+            throw new RuntimeException("cached json has incorrect inner structure");
+        }
         ArrayList<String> sourceCommentsId = new ArrayList<>();
         ObjectNode rootNode = mapper.createObjectNode();
 
@@ -93,5 +95,20 @@ public class DifferenceComparatorService {
             e.printStackTrace();
         }
     }
+
+
+    public void fillComments(final JsonNode node, ObjectNode collection) {
+        JsonNode commentsNode = extractNodeByKey(node, COMMENTS_NODE_NAME);
+
+        for (JsonNode jsonNode : commentsNode) {
+            if (jsonNode.has(SUBCOMMENTS_NODE_NAME) && jsonNode.get(SUBCOMMENTS_NODE_NAME).size() != 0) {
+                //recursive mapping of subcomments
+                fillComments(jsonNode.get(SUBCOMMENTS_NODE_NAME));
+            }
+        }
+        ObjectNode c = mapper.createObjectNode();
+        collection.setAll(c);
+    }
+
 }
 
