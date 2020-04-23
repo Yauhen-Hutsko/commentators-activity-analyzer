@@ -29,7 +29,7 @@ public class DifferenceComparatorService {
     private JsonNode sourceJson;
     private JsonNode cachedJson;
     private ObjectMapper mapper;
-    private JsonNode c;
+    private JsonNode c; // uses like a buffer for recursive method. Can be convert to local if replace recursion with if-statement
 
     public DifferenceComparatorService(String url) {
         sourceURL = url;
@@ -55,14 +55,14 @@ public class DifferenceComparatorService {
         ObjectNode rootNode = mapper.createObjectNode();
 
         c = mapper.createObjectNode();
-        for (JsonNode entry : findAllComments(sourceJson)) {
+        for (JsonNode entry : includeSubComments(sourceJson)) {
             sourceCommentsId.add(entry.get("id").toString());
         }
-        // 5.1 check if sourceJSON and cachedJSON has the difference
+        // check if sourceJSON and cachedJSON has the difference
         c = mapper.createObjectNode();
-        for (JsonNode entry : findAllComments(cachedJson)) {
+        for (JsonNode entry : includeSubComments(cachedJson)) {
             if (!sourceCommentsId.contains(entry.get("id").toString())) {
-                rootNode.set(entry.get("id").toString(), entry);
+                rootNode.set(entry.get("id").asText(), entry);
             }
         }
         return rootNode;
@@ -100,19 +100,32 @@ public class DifferenceComparatorService {
     }
 
 
-    private JsonNode findAllComments(final JsonNode node) {
+    /**
+     * This method takes upper-lvl comment node, extract comments under 'replies' node and return new jsonNode with a full list of comments.
+     * @param node any node that contains json with next fields:<br/>
+     *  <code>{
+     *   "comments": [
+     *     {
+     *       "id": "96e3c5e0",
+     *       "text": "comment1",
+     *       "replies": []
+     *     }
+     *   ]
+     * }</code>
+     * @return all comments that input node comprises.
+     */
+    private JsonNode includeSubComments(final JsonNode node) {
         JsonNode commentsNode = (node.has("comments")) ? node.get("comments") : node;
 
         for (JsonNode jsonNode : commentsNode) {
             if (jsonNode.has("replies") && jsonNode.get("replies").size() != 0) {
                 //recursive mapping of subcomments
-                findAllComments(jsonNode.get("replies"));
+                includeSubComments(jsonNode.get("replies"));
             }
         }
         for (JsonNode jsonNode : commentsNode) {
             ((ObjectNode) c).set(jsonNode.get("id").toString(), jsonNode);
         }
-//        c.se (commentsNode);
         return c;
     }
 }
