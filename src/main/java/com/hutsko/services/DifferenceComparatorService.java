@@ -68,10 +68,10 @@ public class DifferenceComparatorService {
         return rootNode;
     }
 
-    void stashComments(ObjectNode deletedComments) {
+    void stashComments(JsonNode deletedComments) {
         // 4. open connection to DB(txt.file) and upload json for rewriting
         // Use name of the article from URL for file naming
-        File f = new File(sourceURL.substring(sourceURL.lastIndexOf('/') + 1));
+        File f = new File(sourceURL.substring(sourceURL.lastIndexOf('/') + 1) + ".json");
         if (!f.exists()) {
             try {
                 f.createNewFile();
@@ -80,38 +80,41 @@ public class DifferenceComparatorService {
                 //TODO: add logging
                 e.printStackTrace();
             }
-        }
-        ObjectNode storage = null;
-        try {
-            storage = (ObjectNode) mapper.readTree(f);
-        } catch (IOException e) {
-            //TODO: add logging
-            e.printStackTrace();
-        }
-        storage.setAll(deletedComments);
-        // 5. write cache to DB
-        // 6. close connection
-        try {
-            mapper.writeValue(f, storage);
-        } catch (IOException e) {
-            //TODO: add logging
-            e.printStackTrace();
+        } else {
+            JsonNode storage = null;
+            try {
+                storage = mapper.readTree(f);
+            } catch (IOException e) {
+                //TODO: add logging
+                e.printStackTrace();
+            }
+//        ObjectNode o = mapper.createObjectNode();
+//        o.set("stashed",deletedComments);
+            // 5. write cache to DB
+            // 6. close connection
+            try {
+                mapper.writeValue(f, storage);
+            } catch (IOException e) {
+                //TODO: add logging
+                e.printStackTrace();
+            }
         }
     }
 
 
     /**
      * This method takes upper-lvl comment node, extract comments under 'replies' node and return new jsonNode with a full list of comments.
+     *
      * @param node any node that contains json with next fields:<br/>
-     *  <code>{
-     *   "comments": [
-     *     {
-     *       "id": "96e3c5e0",
-     *       "text": "comment1",
-     *       "replies": []
-     *     }
-     *   ]
-     * }</code>
+     *             <code>{
+     *             "comments": [
+     *             {
+     *             "id": "96e3c5e0",
+     *             "text": "comment1",
+     *             "replies": []
+     *             }
+     *             ]
+     *             }</code>
      * @return all comments that input node comprises.
      */
     private JsonNode includeSubComments(final JsonNode node) {

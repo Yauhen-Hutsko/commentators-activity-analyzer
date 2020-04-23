@@ -19,8 +19,9 @@ public class DifferenceComparatorServiceTest {
     private JsonNode sourceJson;
     private JsonNode cachedJson;
     private JsonNode oneComment;
+    private JsonNode forStash;
     private ObjectMapper mapper = new ObjectMapper();
-    //used any valid url just to initialize class.
+    //use any valid url just to initialize class.
     private DifferenceComparatorService service = new DifferenceComparatorService("https://tech.onliner.by/2019/02/20/muzykant-v-it");
 
     @Before
@@ -28,6 +29,7 @@ public class DifferenceComparatorServiceTest {
         sourceJson = mapper.readTree(new File("src/test/resource/source.json")).get("comments");
         cachedJson = mapper.readTree(new File("src/test/resource/cached.json")).get("comments");
         oneComment = mapper.readTree(new File("src/test/resource/oneComment.json")).get("comments");
+        forStash = mapper.readTree(new File("src/test/resource/forStash.json"));
         Whitebox.setInternalState(service, "cachedJson", cachedJson);
         Whitebox.setInternalState(service, "sourceJson", sourceJson);
 
@@ -53,5 +55,16 @@ public class DifferenceComparatorServiceTest {
     }
 
     @Test
-    public void stashComments_should_ (){}
+    public void stashComments_should_create_file (){
+        File f = new File("muzykant-v-it.json");
+
+        service.stashComments(forStash);
+        Assert.assertTrue(f.exists());
+//        Assert.assertTrue(f.delete());
+    }
+
+    @Test
+    public void stashComments_should_append_comments_to_file(){
+        //todo: добавить в json ключ 'stashed' чтообы было что перезаписывать.
+    }
 }
