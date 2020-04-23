@@ -29,6 +29,7 @@ public class DifferenceComparatorService {
     private JsonNode sourceJson;
     private JsonNode cachedJson;
     private ObjectMapper mapper;
+    private JsonNode c;
 
     public DifferenceComparatorService(String url) {
         sourceURL = url;
@@ -53,11 +54,13 @@ public class DifferenceComparatorService {
         ArrayList<String> sourceCommentsId = new ArrayList<>();
         ObjectNode rootNode = mapper.createObjectNode();
 
-        for (JsonNode entry : sourceJson) {
+        c = mapper.createObjectNode();
+        for (JsonNode entry : findAllComments(sourceJson)) {
             sourceCommentsId.add(entry.get("id").toString());
         }
         // 5.1 check if sourceJSON and cachedJSON has the difference
-        for (JsonNode entry : cachedJson) {
+        c = mapper.createObjectNode();
+        for (JsonNode entry : findAllComments(cachedJson)) {
             if (!sourceCommentsId.contains(entry.get("id").toString())) {
                 rootNode.set(entry.get("id").toString(), entry);
             }
@@ -97,18 +100,20 @@ public class DifferenceComparatorService {
     }
 
 
-    public void fillComments(final JsonNode node, ObjectNode collection) {
-        JsonNode commentsNode = extractNodeByKey(node, COMMENTS_NODE_NAME);
+    private JsonNode findAllComments(final JsonNode node) {
+        JsonNode commentsNode = (node.has("comments")) ? node.get("comments") : node;
 
         for (JsonNode jsonNode : commentsNode) {
-            if (jsonNode.has(SUBCOMMENTS_NODE_NAME) && jsonNode.get(SUBCOMMENTS_NODE_NAME).size() != 0) {
+            if (jsonNode.has("replies") && jsonNode.get("replies").size() != 0) {
                 //recursive mapping of subcomments
-                fillComments(jsonNode.get(SUBCOMMENTS_NODE_NAME));
+                findAllComments(jsonNode.get("replies"));
             }
         }
-        ObjectNode c = mapper.createObjectNode();
-        collection.setAll(c);
+        for (JsonNode jsonNode : commentsNode) {
+            ((ObjectNode) c).set(jsonNode.get("id").toString(), jsonNode);
+        }
+//        c.se (commentsNode);
+        return c;
     }
-
 }
 

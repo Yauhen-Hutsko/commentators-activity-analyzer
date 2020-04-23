@@ -1,5 +1,5 @@
 {
-  "description": "This json simulates changed source for DifferenceComparatorService class with two modified id and one deleted entry",
+  "description": "This json simulates changed source for DifferenceComparatorService class with two modified id (835d96b1, 61433951)and one deleted entry (bb936090)",
   "comments": [
     {
       "id": "96e3c5e0",

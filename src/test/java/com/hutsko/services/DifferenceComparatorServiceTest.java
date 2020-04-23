@@ -34,10 +34,9 @@ public class DifferenceComparatorServiceTest {
     }
 
     @Test
-    public void separateDiffComments_should_find_two_comments() {
-//        when(service.separateDiffComments(sourceJson, cachedJson)).then()
+    public void separateDiffComments_should_find_three_comments() {
         ObjectNode root = service.separateDiffComments(sourceJson, cachedJson);
-        Assert.assertEquals(root.size(), 2);
+        Assert.assertEquals(3, root.size());
     }
 
     @Test
