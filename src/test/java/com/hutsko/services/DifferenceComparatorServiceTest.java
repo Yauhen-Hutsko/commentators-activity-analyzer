@@ -3,6 +3,7 @@ package com.hutsko.services;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +21,7 @@ public class DifferenceComparatorServiceTest {
     private JsonNode cachedJson;
     private JsonNode oneComment;
     private JsonNode forStash;
+    private JsonNode stashAppend;
     private ObjectMapper mapper = new ObjectMapper();
     //use any valid url just to initialize class.
     private DifferenceComparatorService service = new DifferenceComparatorService("https://tech.onliner.by/2019/02/20/muzykant-v-it");
@@ -30,9 +32,16 @@ public class DifferenceComparatorServiceTest {
         cachedJson = mapper.readTree(new File("src/test/resource/cached.json")).get("comments");
         oneComment = mapper.readTree(new File("src/test/resource/oneComment.json")).get("comments");
         forStash = mapper.readTree(new File("src/test/resource/forStash.json"));
+        stashAppend = mapper.readTree(new File("src/test/resource/stashAppend.json"));
         Whitebox.setInternalState(service, "cachedJson", cachedJson);
         Whitebox.setInternalState(service, "sourceJson", sourceJson);
 
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        File f = new File("muzykant-v-it.json");
+        f.delete();
     }
 
     @Test
@@ -55,7 +64,7 @@ public class DifferenceComparatorServiceTest {
     }
 
     @Test
-    public void stashComments_should_create_file (){
+    public void stashComments_should_create_file() {
         File f = new File("muzykant-v-it.json");
 
         service.stashComments(forStash);
@@ -64,7 +73,20 @@ public class DifferenceComparatorServiceTest {
     }
 
     @Test
-    public void stashComments_should_append_comments_to_file(){
-
+    public void stashComments_should_write_comments_to_empty_file() throws IOException {
+        File f = new File("muzykant-v-it.json");
+        Assert.assertFalse(f.exists());
+        f.createNewFile();
+        service.stashComments(forStash);
+        Assert.assertEquals(3, mapper.readTree(f).get("stashed").size());
     }
+
+    @Test
+    public void stashComments_should_append_comments_to_file() throws IOException {
+        File f = new File("muzykant-v-it2.json");
+        service.stashComments(stashAppend);
+        Assert.assertEquals(4, mapper.readTree(f).get("stashed").size());
+        Assert.assertTrue(mapper.readTree(f).get("stashed").get("99999999").has("id"));
+    }
+
 }

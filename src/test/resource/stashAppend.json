@@ -1,0 +1,23 @@
+{
+  "stashed": {
+    "99999999": {
+      "id": "99999999",
+      "parent_id": "96e3c5e0",
+      "text": "comment1.1",
+      "author": {
+        "id": 1534591,
+        "type": "user",
+        "name": "1534591"
+      },
+      "marks": {
+        "likes": 3,
+        "dislikes": 1
+      },
+      "mentions": null,
+      "created_at": "2020-03-07T11:20:03.962000+03:00",
+      "updated_by": null,
+      "updated_at": null,
+      "my_mark": null
+    }
+  }
+}

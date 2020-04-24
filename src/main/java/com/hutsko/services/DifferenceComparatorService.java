@@ -74,32 +74,37 @@ public class DifferenceComparatorService {
         // 4. open connection to DB(txt.file) and upload json for rewriting
         // Use name of the article from URL for file naming
         File f = new File(sourceURL.substring(sourceURL.lastIndexOf('/') + 1) + ".json");
-        if (!f.exists()) {
+        if (!f.exists()) { //first encounter
             try {
                 f.createNewFile();
+            } catch (IOException e) {
+                //TODO: add logging
+                e.printStackTrace();
+            }
+        }
+        try {
+            if (f.length() != 0) { //main scenario
+                JsonNode fromStorage = mapper.readTree(f).get("stashed");
+                ObjectNode rootNode = mapper.createObjectNode();
+                rootNode.set("stashed", deletedComments.get("stashed"));
+                rootNode.put("stashed", fromStorage);
+                mapper.writeValue(f, rootNode);
+            } else {
                 mapper.writeValue(f, deletedComments);
-            } catch (IOException e) {
-                //TODO: add logging
-                e.printStackTrace();
             }
-        } else {
-            JsonNode storage = null;
-            try {
-                storage = mapper.readTree(f);
-            } catch (IOException e) {
-                //TODO: add logging
-                e.printStackTrace();
-            }
+        } catch (IOException e) {
+            //TODO: add logging
+            e.printStackTrace();
+        }
 //        ObjectNode o = mapper.createObjectNode();
 //        o.set("stashed",deletedComments);
-            // 5. write cache to DB
-            // 6. close connection
-            try {
-                mapper.writeValue(f, storage);
-            } catch (IOException e) {
-                //TODO: add logging
-                e.printStackTrace();
-            }
+        // 5. write cache to DB
+        // 6. close connection
+        try {
+            mapper.writeValue(f, deletedComments);
+        } catch (IOException e) {
+            //TODO: add logging
+            e.printStackTrace();
         }
     }
 
