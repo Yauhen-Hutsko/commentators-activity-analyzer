@@ -38,19 +38,19 @@ public class DifferenceComparatorServiceTest {
     @Test
     public void separateDiffComments_should_find_three_comments() {
         ObjectNode root = service.separateDiffComments(sourceJson, cachedJson);
-        Assert.assertEquals(3, root.size());
+        Assert.assertEquals(3, root.get("stashed").size());
     }
 
     @Test
     public void separateDiffComments_should_not_find_any_comment() throws IOException {
         ObjectNode root = service.separateDiffComments(sourceJson, sourceJson);
-        Assert.assertEquals(0, root.size());
+        Assert.assertEquals(0, root.get("stashed").size());
     }
 
     @Test
     public void separateDiffComments_should_add_every_comment() throws IOException {
-        ObjectNode root2 = service.separateDiffComments(oneComment, sourceJson);
-        Assert.assertEquals(12, root2.size());
+        ObjectNode root = service.separateDiffComments(oneComment, sourceJson);
+        Assert.assertEquals(12, root.get("stashed").size());
 
     }
 
@@ -60,11 +60,11 @@ public class DifferenceComparatorServiceTest {
 
         service.stashComments(forStash);
         Assert.assertTrue(f.exists());
-//        Assert.assertTrue(f.delete());
+        Assert.assertTrue(f.delete());
     }
 
     @Test
     public void stashComments_should_append_comments_to_file(){
-        //todo: добавить в json ключ 'stashed' чтообы было что перезаписывать.
+
     }
 }

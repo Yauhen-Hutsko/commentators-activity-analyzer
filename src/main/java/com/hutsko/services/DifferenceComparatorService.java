@@ -53,8 +53,9 @@ public class DifferenceComparatorService {
         }
         ArrayList<String> sourceCommentsId = new ArrayList<>();
         ObjectNode rootNode = mapper.createObjectNode();
+        ObjectNode stashed = mapper.createObjectNode();
 
-        c = mapper.createObjectNode();
+        c = mapper.createObjectNode(); //bad solution
         for (JsonNode entry : includeSubComments(sourceJson)) {
             sourceCommentsId.add(entry.get("id").toString());
         }
@@ -62,9 +63,10 @@ public class DifferenceComparatorService {
         c = mapper.createObjectNode();
         for (JsonNode entry : includeSubComments(cachedJson)) {
             if (!sourceCommentsId.contains(entry.get("id").toString())) {
-                rootNode.set(entry.get("id").asText(), entry);
+                stashed.set(entry.get("id").asText(), entry);
             }
         }
+        rootNode.set("stashed", stashed);
         return rootNode;
     }
 
