@@ -22,6 +22,7 @@ public class DifferenceComparatorServiceTest {
     private JsonNode oneComment;
     private JsonNode forStash;
     private JsonNode stashAppend;
+    private String stashed;
     private ObjectMapper mapper = new ObjectMapper();
     //use any valid url just to initialize class.
     private DifferenceComparatorService service = new DifferenceComparatorService("https://tech.onliner.by/2019/02/20/muzykant-v-it");
@@ -33,6 +34,7 @@ public class DifferenceComparatorServiceTest {
         oneComment = mapper.readTree(new File("src/test/resource/oneComment.json")).get("comments");
         forStash = mapper.readTree(new File("src/test/resource/forStash.json"));
         stashAppend = mapper.readTree(new File("src/test/resource/stashAppend.json"));
+        stashed = "src/test/resource/muzykant-v-it.json";
         Whitebox.setInternalState(service, "cachedJson", cachedJson);
         Whitebox.setInternalState(service, "sourceJson", sourceJson);
 
@@ -83,10 +85,15 @@ public class DifferenceComparatorServiceTest {
 
     @Test
     public void stashComments_should_append_comments_to_file() throws IOException {
-        File f = new File("muzykant-v-it2.json");
+        File f = new File("muzykant-v-it.json");
+        Assert.assertFalse("Delete an old file and repeat test", f.exists());
+        f.createNewFile();
+        mapper.writeValue(f, mapper.readTree(new File(stashed))); //populate temporary file with 3 entries.
+
         service.stashComments(stashAppend);
-        Assert.assertEquals(4, mapper.readTree(f).get("stashed").size());
-        Assert.assertTrue(mapper.readTree(f).get("stashed").get("99999999").has("id"));
+        Assert.assertEquals(5, mapper.readTree(f).get("stashed").size());
+        Assert.assertTrue(mapper.readTree(f).get("stashed").get("99999999").has("id")); //entity from appender
+        Assert.assertTrue(mapper.readTree(f).get("stashed").get("bb936090").has("id")); //entity from stash
     }
 
 }

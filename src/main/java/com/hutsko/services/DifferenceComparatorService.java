@@ -9,6 +9,8 @@ import com.hutsko.ArticleLoaderFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Service description:
@@ -60,7 +62,7 @@ public class DifferenceComparatorService {
             sourceCommentsId.add(entry.get("id").toString());
         }
         // check if sourceJSON and cachedJSON has the difference
-        c = mapper.createObjectNode();
+        c = mapper.createObjectNode(); //bad solution
         for (JsonNode entry : includeSubComments(cachedJson)) {
             if (!sourceCommentsId.contains(entry.get("id").toString())) {
                 stashed.set(entry.get("id").asText(), entry);
@@ -84,10 +86,16 @@ public class DifferenceComparatorService {
         }
         try {
             if (f.length() != 0) { //main scenario
-                JsonNode fromStorage = mapper.readTree(f).get("stashed");
+                JsonNode storage = mapper.readTree(f).get("stashed");
+                Iterator<Map.Entry<String, JsonNode>> iterator = deletedComments.get("stashed").fields();
                 ObjectNode rootNode = mapper.createObjectNode();
-                rootNode.set("stashed", deletedComments.get("stashed"));
-                rootNode.put("stashed", fromStorage);
+                while (iterator.hasNext()) {
+                    Map.Entry i = iterator.next();
+                    ((ObjectNode) storage).set(i.getKey().toString(), (JsonNode) i.getValue());
+                }
+                JsonNode updatedStorage = mapper.readTree(storage.toString());
+                rootNode.set("stashed", updatedStorage);
+                // 5. save cache to DB
                 mapper.writeValue(f, rootNode);
             } else {
                 mapper.writeValue(f, deletedComments);
@@ -96,16 +104,7 @@ public class DifferenceComparatorService {
             //TODO: add logging
             e.printStackTrace();
         }
-//        ObjectNode o = mapper.createObjectNode();
-//        o.set("stashed",deletedComments);
-        // 5. write cache to DB
-        // 6. close connection
-        try {
-            mapper.writeValue(f, deletedComments);
-        } catch (IOException e) {
-            //TODO: add logging
-            e.printStackTrace();
-        }
+        // 6. close connection if needed
     }
 
 
