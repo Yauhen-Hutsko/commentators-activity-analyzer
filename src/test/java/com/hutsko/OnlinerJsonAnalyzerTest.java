@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 public class OnlinerJsonAnalyzerTest {
-    private static final String JSON_TEST_FILE = "src/test/resource/test.json";
-    private static final String JSON_COMMENT_FILE = "src/test/resource/oneComment.json";
+    private static final String JSON_TEST_FILE = "src/test/resources/test.json";
+    private static final String JSON_COMMENT_FILE = "src/test/resources/oneComment.json";
     private static final String COMMENT_TEXT = "\u0418 \u043d\u0430\u043a\u0430\u043a\u043e\u0435 \u0430\u0439\u0442\u044b \u043d\u0435 \u043d\u0443\u0436\u043d\u043e...";
     private OnlinerJsonAnalyzer analyzer;
     private JsonNode inputJson;

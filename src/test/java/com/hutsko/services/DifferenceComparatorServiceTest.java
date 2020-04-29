@@ -29,12 +29,12 @@ public class DifferenceComparatorServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        sourceJson = mapper.readTree(new File("src/test/resource/source.json")).get("comments");
-        cachedJson = mapper.readTree(new File("src/test/resource/cached.json")).get("comments");
-        oneComment = mapper.readTree(new File("src/test/resource/oneComment.json")).get("comments");
-        forStash = mapper.readTree(new File("src/test/resource/forStash.json"));
-        stashAppend = mapper.readTree(new File("src/test/resource/stashAppend.json"));
-        stashed = "src/test/resource/muzykant-v-it.json";
+        sourceJson = mapper.readTree(new File("src/test/resources/source.json")).get("comments");
+        cachedJson = mapper.readTree(new File("src/test/resources/cached.json")).get("comments");
+        oneComment = mapper.readTree(new File("src/test/resources/oneComment.json")).get("comments");
+        forStash = mapper.readTree(new File("src/test/resources/forStash.json"));
+        stashAppend = mapper.readTree(new File("src/test/resources/stashAppend.json"));
+        stashed = "src/test/resources/muzykant-v-it.json";
         Whitebox.setInternalState(service, "cachedJson", cachedJson);
         Whitebox.setInternalState(service, "sourceJson", sourceJson);
 

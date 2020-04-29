@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hutsko.ArticleLoader;
 import com.hutsko.ArticleLoaderFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +27,7 @@ import java.util.Map;
  * note: TODO:#Mustithread - every article has its own thread
  */
 public class DifferenceComparatorService {
+    private static Logger log = LoggerFactory.getLogger(DifferenceComparatorService.class);
 
     private String sourceURL;
     private ArticleLoader article;
@@ -45,8 +48,10 @@ public class DifferenceComparatorService {
         sourceJson = article.getCommentsRootNode().get("comments");
         ObjectNode difference = separateDiffComments(sourceJson, cachedJson);
         if (difference.size() > 0) {
+            log.info("Found deleted comments");
             stashComments(difference);
         }
+        log.info("Deleted comments not found");
     }
 
     ObjectNode separateDiffComments(JsonNode sourceJson, JsonNode cachedJson) {
@@ -61,6 +66,8 @@ public class DifferenceComparatorService {
         for (JsonNode entry : includeSubComments(sourceJson)) {
             sourceCommentsId.add(entry.get("id").toString());
         }
+        log.info(sourceCommentsId.size() + " comments read from source.");
+
         // check if sourceJSON and cachedJSON has the difference
         c = mapper.createObjectNode(); //bad solution
         for (JsonNode entry : includeSubComments(cachedJson)) {
@@ -69,6 +76,7 @@ public class DifferenceComparatorService {
             }
         }
         rootNode.set("stashed", stashed);
+        log.info(rootNode.size() + " deleted comments was found.");
         return rootNode;
     }
 

@@ -5,6 +5,7 @@
 *.iml
 classes/
 target/
+logs/
 
 .idea/*
 # User-specific stuff:

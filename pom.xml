@@ -25,9 +25,20 @@
         <jsonPath.version>2.4.0</jsonPath.version>
         <jackson.version>2.9.9</jackson.version>
         <jackson.bind.version>2.9.10.4</jackson.bind.version>
+        <slf4j.version>1.7.30</slf4j.version>
+        <log4j.version>2.11.0</log4j.version>
     </properties>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>*log4j2.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
             <plugins>
                 <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
@@ -114,8 +125,8 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
                 <!--<property>-->
-                    <!--<name>environment</name>-->
-                    <!--<value>dev</value>-->
+                <!--<name>environment</name>-->
+                <!--<value>dev</value>-->
                 <!--</property>-->
             </activation>
         </profile>
@@ -171,12 +182,29 @@
             <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
-        <!-- jsp related dependencies -->
         <dependency>
             <groupId>jstl</groupId>
             <artifactId>jstl</artifactId>
             <version>1.2</version>
         </dependency>
-
+        <!--logging-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
