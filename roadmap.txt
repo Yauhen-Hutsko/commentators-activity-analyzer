@@ -2,7 +2,7 @@
 + read the page
 + read variables from <app> tag and compose 1st request for getting last comment
 + parse response and compose second request for getting full comments json
-+ save a title of the article, its publication time.
++ save a title and publication time of the article.
 + process json
     + create Comment entity
     + get list of comments
@@ -17,14 +17,14 @@
 + Set up deploy to Tomcat
 - create pom-profile for redeploy project to tomcat
 - Create test-jsp
-- find out how json with comments changes after moderation
++ find out how json with comments changes after moderation
 - add some web representation of interesting data
 - Refactor accordingly SOLID principles
+- turn on logging
 - implement the class for checking deleted comments
-    - turn on logging
     - write a message to logs by schedule
-    - save comments to file
-    - upload file to memory and update it with difference
+    + save comments to file
+    + upload file to memory and update it with difference
 - implement reading URL from console, otherwise first line from file.
 
 Interesting metrics:
