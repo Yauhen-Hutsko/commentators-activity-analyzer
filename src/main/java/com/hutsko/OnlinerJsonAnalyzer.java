@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hutsko.entity.Comment;
 import com.hutsko.entity.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import java.util.Map;
  * about comments.</p>
  */
 public class OnlinerJsonAnalyzer implements JsonAnalyzer {
+    private static Logger log = LoggerFactory.getLogger(OnlinerJsonAnalyzer.class);
     private static final String COMMENTS_NODE_NAME = "comments";
     private static final String SUBCOMMENTS_NODE_NAME = "replies";
     private final List<Comment> comments = new ArrayList<>();
@@ -95,9 +98,8 @@ public class OnlinerJsonAnalyzer implements JsonAnalyzer {
             try {
                 comment = mapper.readValue(node.toString(), Comment.class);
             } catch (IOException e) {
-                //TODO: add logging
-                e.printStackTrace();
-            }
+                log.error("Cannot map the value from json node to Comment.class", e);
+                }
             comments.add(comment);
         }
         return comments;

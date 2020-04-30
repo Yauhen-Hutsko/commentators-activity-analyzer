@@ -6,6 +6,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
@@ -18,7 +20,8 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-public class OnlinerArticleLoader implements ArticleLoader{
+public class OnlinerArticleLoader implements ArticleLoader {
+    private static Logger log = LoggerFactory.getLogger(OnlinerArticleLoader.class);
     private static final int QUANTITY_OF_LAST_COMMENTS = 99999;
     private String sourceURL;
     private String title;
@@ -73,12 +76,9 @@ public class OnlinerArticleLoader implements ArticleLoader{
             ObjectMapper mapper = new ObjectMapper();
             commentsNode = mapper.readTree(stringBuilder.toString());
         } catch (MalformedURLException e) {
-            //todo: add logging
-            System.err.println("Can't parse the URL string");
-            e.printStackTrace();
+            log.error("Can't parse the URL string \"" + httpsRequestUrl + "\"", e);
         } catch (IOException e) {
-            //todo: add logging
-            e.printStackTrace();
+            log.error("Error occurred around BufferedReader. ", e);
         }
         return commentsNode;
     }
@@ -90,7 +90,7 @@ public class OnlinerArticleLoader implements ArticleLoader{
     }
 
     private void setMetaData(Document document) {
-        this.title = !document.title().isEmpty()? document.title(): "not found";
+        this.title = !document.title().isEmpty() ? document.title() : "not found";
         String creationDate = document.getElementsByAttributeValue("name", "article:published_time").first().attr("content");
         if (!creationDate.isEmpty()) {
             this.created = LocalDateTime.parse(creationDate, DateTimeFormatter.ofPattern(

@@ -10,7 +10,7 @@
     </Appenders>
     <Loggers>
         <!--name for logger mustn't contain regExp symbols like com.hutsko.*-->
-        <Logger name="com.hutsko" level="info" additivity="true">
+        <Logger name="com.hutsko" level="debug" additivity="false">
             <AppenderRef ref="file"/>
         </Logger>
         <Root level="error">

@@ -45,17 +45,22 @@ public class DifferenceComparatorService {
 
     // separate diff
     void process() {
+        log.debug("process():starts");
         sourceJson = article.getCommentsRootNode().get("comments");
         ObjectNode difference = separateDiffComments(sourceJson, cachedJson);
         if (difference.size() > 0) {
             log.info("Found deleted comments");
             stashComments(difference);
         }
+        log.debug("process():ends");
         log.info("Deleted comments not found");
     }
 
     ObjectNode separateDiffComments(JsonNode sourceJson, JsonNode cachedJson) {
+        log.debug("separateDiffComments():starts");
+
         if (!cachedJson.elements().hasNext()) {
+            log.error("'cachedJson' has not valid structure: " + cachedJson);
             throw new RuntimeException("cached json has incorrect inner structure");
         }
         ArrayList<String> sourceCommentsId = new ArrayList<>();
@@ -66,10 +71,7 @@ public class DifferenceComparatorService {
         for (JsonNode entry : includeSubComments(sourceJson)) {
             sourceCommentsId.add(entry.get("id").toString());
         }
-        log.debug(sourceCommentsId.size() + " comments read from source.");
         log.info(sourceCommentsId.size() + " comments read from source.");
-        log.warn(sourceCommentsId.size() + " comments read from source.");
-        log.error(sourceCommentsId.size() + " comments read from source.");
 
         // check if sourceJSON and cachedJSON has the difference
         c = mapper.createObjectNode(); //bad solution
@@ -80,6 +82,7 @@ public class DifferenceComparatorService {
         }
         rootNode.set("stashed", stashed);
         log.info(rootNode.size() + " deleted comments was found.");
+        log.debug("separateDiffComments():ends");
         return rootNode;
     }
 
@@ -92,7 +95,6 @@ public class DifferenceComparatorService {
             try {
                 f.createNewFile();
                 log.info("File " + f.getName() + " was created.");
-
             } catch (IOException e) {
                 log.error("Can't create a file " + f.getName() + ".", e);
             }
@@ -100,24 +102,26 @@ public class DifferenceComparatorService {
         try {
             if (f.length() != 0) { //main scenario
                 JsonNode storage = mapper.readTree(f).get("stashed");
+                log.debug("Loaded " + storage.size() + " from storage.");
                 Iterator<Map.Entry<String, JsonNode>> iterator = deletedComments.get("stashed").fields();
                 ObjectNode rootNode = mapper.createObjectNode();
                 while (iterator.hasNext()) {
                     Map.Entry i = iterator.next();
                     ((ObjectNode) storage).set(i.getKey().toString(), (JsonNode) i.getValue());
                 }
-                JsonNode updatedStorage = mapper.readTree(storage.toString());
-                rootNode.set("stashed", updatedStorage);
+                rootNode.set("stashed", storage);
                 // 5. save cache to DB
                 mapper.writeValue(f, rootNode);
+                log.info("Deleted comments was appended to file" + f.getName() + ". New quantity is: " + storage.size());
             } else {
                 mapper.writeValue(f, deletedComments);
+                log.info("Deleted comments was written to empty file");
             }
         } catch (IOException e) {
-            //TODO: add logging
-            e.printStackTrace();
+            log.error("Some problem occurred during json reading from or writing to file ", e);
         }
         // 6. close connection if needed
+        log.debug("stashComments():ends");
     }
 
 
