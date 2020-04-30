@@ -27,7 +27,7 @@ import java.util.Map;
  * note: TODO:#Mustithread - every article has its own thread
  */
 public class DifferenceComparatorService {
-    private static Logger log = LoggerFactory.getLogger(DifferenceComparatorService.class);
+    private static Logger log = LoggerFactory.getLogger(DifferenceComparatorService.class.getName());
 
     private String sourceURL;
     private ArticleLoader article;
@@ -66,7 +66,10 @@ public class DifferenceComparatorService {
         for (JsonNode entry : includeSubComments(sourceJson)) {
             sourceCommentsId.add(entry.get("id").toString());
         }
+        log.debug(sourceCommentsId.size() + " comments read from source.");
         log.info(sourceCommentsId.size() + " comments read from source.");
+        log.warn(sourceCommentsId.size() + " comments read from source.");
+        log.error(sourceCommentsId.size() + " comments read from source.");
 
         // check if sourceJSON and cachedJSON has the difference
         c = mapper.createObjectNode(); //bad solution
@@ -81,15 +84,17 @@ public class DifferenceComparatorService {
     }
 
     void stashComments(JsonNode deletedComments) {
+        log.debug("stashComments():starts");
         // 4. open connection to DB(txt.file) and upload json for rewriting
         // Use name of the article from URL for file naming
         File f = new File(sourceURL.substring(sourceURL.lastIndexOf('/') + 1) + ".json");
         if (!f.exists()) { //first encounter
             try {
                 f.createNewFile();
+                log.info("File " + f.getName() + " was created.");
+
             } catch (IOException e) {
-                //TODO: add logging
-                e.printStackTrace();
+                log.error("Can't create a file " + f.getName() + ".", e);
             }
         }
         try {
