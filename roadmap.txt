@@ -16,16 +16,16 @@
 + Search comments by words
 + Set up deploy to Tomcat
 - create pom-profile for redeploy project to tomcat
-- Create test-jsp
++ Create test-jsp
 + find out how json with comments changes after moderation
 - add some web representation of interesting data
 - Refactor accordingly SOLID principles
-- turn on logging
++ turn on logging
 - implement the class for checking deleted comments
     - write a message to logs by schedule
     + save comments to file
     + upload file to memory and update it with difference
-- implement reading URL from console, otherwise first line from file.
+- implement reading URL from console, otherwise first line from file (for what?).
 
 Interesting metrics:
  1. How many days after publishing do ppl write comments
@@ -37,3 +37,5 @@ Interesting metrics:
  7. Find all user activity (multi-article analysis).
  8. Recognize a troll-activity under politic articles.
  9. Compare user comments regarding one topic at different time (e.g. seryoga).
+ 10. Add ML to recognize comments 'mood' and find other comment of author written under pseudonyms.
+ 11. Move the project to AEM.
