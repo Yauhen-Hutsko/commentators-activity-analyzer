@@ -19,7 +19,7 @@ import java.util.Map;
  * about comments.</p>
  */
 public class OnlinerJsonAnalyzer implements JsonAnalyzer {
-    private static Logger log = LoggerFactory.getLogger(OnlinerJsonAnalyzer.class);
+    private static final Logger log = LoggerFactory.getLogger(OnlinerJsonAnalyzer.class);
     private static final String COMMENTS_NODE_NAME = "comments";
     private static final String SUBCOMMENTS_NODE_NAME = "replies";
     private final List<Comment> comments = new ArrayList<>();
