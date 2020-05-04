@@ -7,7 +7,7 @@
 
   <body>
       <p>Hello boomer.</p>
-      <p>ver. 1.1.0</p>
+      <p>ver. 1.1.1</p>
       <jsp:useBean id="api" scope="page" class="com.hutsko.impl.CommentParserApiImpl"/>
       <strong>
   	<jsp:text>Old value:</jsp:text>
