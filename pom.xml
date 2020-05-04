@@ -104,6 +104,7 @@
                         <server>TomcatServer</server>
                         <username>war-deployer</username>
                         <password>maven-tomcat-plugin</password>
+                        <update>true</update>
                     </configuration>
                 </plugin>
             </plugins>
