@@ -12,7 +12,7 @@
 
     <name>greatanalyzer</name>
     <!-- FIXME change it to the project's website -->
-    <url>http://localhost:8080/greatanalyzer</url>
+    <url>http://localhost:8081/greatanalyzer</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -94,23 +94,23 @@
                     <artifactId>maven-project-info-reports-plugin</artifactId>
                     <version>3.0.0</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.tomcat.maven</groupId>
-                    <artifactId>tomcat7-maven-plugin</artifactId>
-                    <version>2.2</version>
-                    <configuration>
-                        <failOnError>true</failOnError>
-                        <url>http://localhost:8081/manager/text</url>
-                        <server>TomcatServer</server>
-                        <username>war-deployer</username>
-                        <password>maven-tomcat-plugin</password>
-                        <update>true</update>
-                    </configuration>
-                </plugin>
             </plugins>
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <failOnError>true</failOnError>
+                    <url>http://localhost:8081/manager/text</url>
+                    <server>TomcatServer</server>
+                    <username>war-deployer</username>
+                    <password>maven-tomcat-plugin</password>
+                    <update>true</update>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -138,35 +138,14 @@
 
     <profiles>
         <profile>
-            <id>install-all</id>
+            <id>deploy</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.tomcat.maven</groupId>
-                            <artifactId>tomcat7-maven-plugin</artifactId>
-                            <executions>
-                                <execution>
-                                    <id>deploy-to-tomcat</id>
-                                    <!--<phase>install</phase>-->
-                                    <goals>
-                                        <goal>undeploy</goal>
-                                        <goal>deploy</goal>
-                                    </goals>
-                                    <configuration>
-                                        <url>http://localhost:8081/manager/text</url>
-                                        <server>TomcatServer</server>
-                                        <username>war-deployer</username>
-                                        <password>maven-tomcat-plugin</password>
-                                    </configuration>
-                                </execution>
-                            </executions>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
+                <defaultGoal>
+                    clean install tomcat7:deploy
+                </defaultGoal>
             </build>
         </profile>
         <profile>

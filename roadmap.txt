@@ -26,6 +26,7 @@
     + save comments to file
     + upload file to memory and update it with difference
 - implement reading URL from console, otherwise first line from file (for what?).
+- JS: show an url inside input-field after submitting form.
 
 Interesting metrics:
  1. How many days after publishing do ppl write comments
