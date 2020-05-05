@@ -6,13 +6,16 @@
   </head>
 
   <body>
+  <div>
+  <div class="inner-div-1">inner div1</div><div class="inner-div-2">inner div2</div>
+  <div class="inner-div-3">
       <p>Hello boomer.</p>
-      <p>ver. 1.1.1</p>
+      <p>ver. 1.1.2</p>
       <jsp:useBean id="api" scope="page" class="com.hutsko.impl.CommentParserApiImpl"/>
       <strong>
   	<jsp:text>Old value:</jsp:text>
   	</strong>${api.hello}<br>
-      <jsp:setProperty name="api" property="hello" value="bye bye motherfucker"/>
+      <jsp:setProperty name="api" property="hello" value="Hello boomer"/>
   	<strong><jsp:text>New value: </jsp:text></strong>
       ${api.hello}
 
@@ -29,9 +32,11 @@
   	    <h2>All comments below</h2>
   	    <br>
   	    <c:forEach items="${comments}" var="comment">
-  	    <jsp:text>comment</jsp:text>
+  	        <c:out value="${comment}"/><br/>
   	    </c:forEach>
   	    </c:if>
+  	</div>
+  	</div>
   	</div>
     </body>
 </html>

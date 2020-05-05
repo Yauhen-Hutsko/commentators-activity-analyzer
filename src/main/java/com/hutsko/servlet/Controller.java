@@ -1,6 +1,5 @@
 package com.hutsko.servlet;
 
-import com.hutsko.CommentParserApi;
 import com.hutsko.JsonAnalyzer;
 import com.hutsko.OnlinerArticleLoader;
 import com.hutsko.OnlinerJsonAnalyzer;
@@ -40,7 +39,7 @@ public class Controller extends HttpServlet {
         OnlinerArticleLoader parser = new OnlinerArticleLoader(url);
         JsonAnalyzer jsonAnalyzer = new OnlinerJsonAnalyzer(parser.getCommentsRootNode());
 
-        CommentParserApi parserApi = new CommentParserApiImpl(jsonAnalyzer);
+        CommentParserApiImpl parserApi = new CommentParserApiImpl(jsonAnalyzer);
 
         req.setAttribute("comments", jsonAnalyzer.getComments());
         req.getRequestDispatcher("/jsp/welcome.jsp").forward(req, resp);
@@ -52,7 +51,7 @@ public class Controller extends HttpServlet {
         log.info("Scheduler activated");
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
         BringCommentsScheduler scheduler = new BringCommentsScheduler(url);
-        executor.scheduleAtFixedRate(scheduler, 0, 5,TimeUnit.MINUTES);
+        executor.scheduleAtFixedRate(scheduler, 0, 5, TimeUnit.MINUTES);
         while (executor.getCompletedTaskCount() > 5) {
             executor.shutdown();
             log.info("Scheduler terminated");
