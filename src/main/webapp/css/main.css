@@ -1,0 +1,21 @@
+body {
+    background-color: dimgray
+}
+
+.inner-div-1 {
+    float: right;
+    min-width: 50%;
+    min-height: 200px;
+    background-color: aquamarine
+}
+
+.inner-div-2 {
+    float: right;
+    min-width: 50%;
+    min-height: 200px;
+    background-color: beige
+}
+
+.inner-div-3 {
+    background-color: azure
+}

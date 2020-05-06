@@ -3,11 +3,15 @@
 <html>
   <head>
     <title>Welcome page</title>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/main.css">
   </head>
 
   <body>
-  <div>
-  <div class="inner-div-1">inner div1</div><div class="inner-div-2">inner div2</div>
+  <div>    
+      <div>
+        <div class="inner-div-1">inner div1</div>
+        <div class="inner-div-2">inner div2</div>
+      </div>
   <div class="inner-div-3">
       <p>Hello boomer.</p>
       <p>ver. 1.1.2</p>
