@@ -9,7 +9,14 @@
   <body>
   <div>    
       <div>
-        <div class="inner-div-1">inner div1</div>
+        <div class="inner-div-1">
+            <div>
+              	<form id="tracked" method="get" action="controller">
+              		<input type="url" name="tracked" title="Enter onliter's article URL and it will be added to watch list for moderated comments"/>
+              		<button type="submit">Track article</button>
+              	</form>
+            </div>
+        </div>
         <div class="inner-div-2">inner div2</div>
       </div>
   <div class="inner-div-3">

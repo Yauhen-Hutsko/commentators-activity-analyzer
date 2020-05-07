@@ -19,6 +19,7 @@
 + Create test-jsp
 + find out how json with comments changes after moderation
 - add some web representation of interesting data
+- add save project version number in property file and use in pom and jsp.
 - Refactor accordingly SOLID principles
 + turn on logging
 - implement the class for checking deleted comments
