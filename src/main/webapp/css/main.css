@@ -3,14 +3,14 @@ body {
 }
 
 .inner-div-1 {
-    float: right;
+    float: left;
     min-width: 50%;
     min-height: 200px;
     background-color: aquamarine
 }
 
 .inner-div-2 {
-    float: right;
+    float: left;
     min-width: 50%;
     min-height: 200px;
     background-color: beige

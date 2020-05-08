@@ -17,7 +17,9 @@
               	</form>
             </div>
         </div>
-        <div class="inner-div-2">inner div2</div>
+        <div class="inner-div-2">
+
+        </div>
       </div>
   <div class="inner-div-3">
       <p>Hello boomer.</p>

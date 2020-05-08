@@ -28,6 +28,7 @@ import java.util.Map;
  */
 public class DifferenceComparatorService {
     private static Logger log = LoggerFactory.getLogger(DifferenceComparatorService.class.getName());
+    public static final String TOMCAT_RESOURCE_FOLDER = "../GADB/";
 
     private String sourceURL;
     private ArticleLoader article;
@@ -45,7 +46,7 @@ public class DifferenceComparatorService {
 
     // separate diff
     void process() {
-        log.debug("process():starts");
+        log.debug("DifferenceComparatorService.process():starts");
         sourceJson = article.getCommentsRootNode().get("comments");
         ObjectNode difference = separateDiffComments(sourceJson, cachedJson);
         if (difference.size() > 0) {
@@ -81,7 +82,7 @@ public class DifferenceComparatorService {
             }
         }
         rootNode.set("stashed", stashed);
-        log.info(rootNode.size() + " deleted comments was found.");
+        log.info(rootNode.size() + " deleted comments was found.\n", stashed);
         log.debug("separateDiffComments():ends");
         return rootNode;
     }
@@ -96,7 +97,7 @@ public class DifferenceComparatorService {
                 f.createNewFile();
                 log.info("File " + f.getName() + " was created.");
             } catch (IOException e) {
-                log.error("Can't create a file " + f.getName() + ".", e);
+                log.error("Can't create a file " + f.getName() + " under the path " + f.getPath(), e);
             }
         }
         try {

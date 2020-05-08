@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 @WebServlet(name = "controller", urlPatterns = "/controller")
 public class Controller extends HttpServlet {
     private static Logger log = LoggerFactory.getLogger(Controller.class);
-    private String url;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -33,29 +32,33 @@ public class Controller extends HttpServlet {
     }
 
     private void process(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        url = req.getParameter("articleURL");
-
+        log.debug("Controller invoked.");
+        String contextPath = req.getContextPath();
+        String watchedArticle = req.getParameter("tracked");
+        if (watchedArticle != null && !watchedArticle.isEmpty()) {
+            scheduledPoll(watchedArticle);
+        }
         // todo: create a factory that will validate url and create correct Parser.
-        OnlinerArticleLoader parser = new OnlinerArticleLoader(url);
-        JsonAnalyzer jsonAnalyzer = new OnlinerJsonAnalyzer(parser.getCommentsRootNode());
 
-        CommentParserApiImpl parserApi = new CommentParserApiImpl(jsonAnalyzer);
+        String url = req.getParameter("articleURL");
+        if (url != null) {
+            OnlinerArticleLoader parser = new OnlinerArticleLoader(url);
+            JsonAnalyzer jsonAnalyzer = new OnlinerJsonAnalyzer(parser.getCommentsRootNode());
 
-        req.setAttribute("comments", jsonAnalyzer.getComments());
+            CommentParserApiImpl parserApi = new CommentParserApiImpl(jsonAnalyzer);
+            req.setAttribute("comments", jsonAnalyzer.getComments());
+        }
         req.getRequestDispatcher("/jsp/welcome.jsp").forward(req, resp);
-
     }
 
     //TODO: implement this functionality on JSP page and test it.
-    private void scheduledPoll() {
+    private void scheduledPoll(String url) {
         log.info("Scheduler activated");
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
         BringCommentsScheduler scheduler = new BringCommentsScheduler(url);
+//        scheduler.run();
         executor.scheduleAtFixedRate(scheduler, 0, 5, TimeUnit.MINUTES);
-        while (executor.getCompletedTaskCount() > 5) {
-            executor.shutdown();
-            log.info("Scheduler terminated");
-        }
+        log.info("Scheduler terminated");
 
     }
 }

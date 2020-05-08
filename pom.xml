@@ -232,7 +232,7 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>${log4j.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope> <!-- Don't user 'test' scope. 'Compile' allows to deploy log4j jar's to Tomcat-->
         </dependency>
     </dependencies>
 </project>
