@@ -4,7 +4,7 @@ import com.hutsko.JsonAnalyzer;
 import com.hutsko.OnlinerArticleLoader;
 import com.hutsko.OnlinerJsonAnalyzer;
 import com.hutsko.impl.CommentParserApiImpl;
-import com.hutsko.services.BringCommentsScheduler;
+import com.hutsko.services.BringCommentsTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,12 +14,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @WebServlet(name = "controller", urlPatterns = "/controller")
 public class Controller extends HttpServlet {
     private static Logger log = LoggerFactory.getLogger(Controller.class);
+    private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);;
+    private ArrayList<BringCommentsTask> tasks = new ArrayList<>();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -33,10 +36,17 @@ public class Controller extends HttpServlet {
 
     private void process(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         log.debug("Controller invoked.");
-        String contextPath = req.getContextPath();
+        String projectRoot = req.getContextPath();
         String watchedArticle = req.getParameter("tracked");
+        String shutdown = req.getParameter("shutdownTasks");
         if (watchedArticle != null && !watchedArticle.isEmpty()) {
             scheduledPoll(watchedArticle);
+        }
+        if (shutdown != null ) {
+            for (BringCommentsTask task : tasks) {
+                task.getThread().interrupt();
+            }
+            executor.shutdown();
         }
         // todo: create a factory that will validate url and create correct Parser.
 
@@ -47,18 +57,21 @@ public class Controller extends HttpServlet {
 
             CommentParserApiImpl parserApi = new CommentParserApiImpl(jsonAnalyzer);
             req.setAttribute("comments", jsonAnalyzer.getComments());
+            req.setAttribute("tasks", getTasks());
         }
-        req.getRequestDispatcher("/jsp/welcome.jsp").forward(req, resp);
+//        req.getRequestDispatcher("/jsp/welcome.jsp").forward(req, resp);
+        resp.sendRedirect(projectRoot + "/jsp/welcome.jsp");
     }
 
     //TODO: implement this functionality on JSP page and test it.
     private void scheduledPoll(String url) {
-        log.info("Scheduler activated");
-        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-        BringCommentsScheduler scheduler = new BringCommentsScheduler(url);
-//        scheduler.run();
-        executor.scheduleAtFixedRate(scheduler, 0, 5, TimeUnit.MINUTES);
-        log.info("Scheduler terminated");
+        BringCommentsTask task = new BringCommentsTask(url);
+        tasks.add(task);
+        executor.scheduleAtFixedRate(task, 0, 5, TimeUnit.MINUTES);
+        log.debug("Found tasks: (%1$s). Scheduled tasks: 2$s | 2s", tasks.size(), executor.getQueue().size());
+    }
 
+    public ArrayList<BringCommentsTask> getTasks() {
+        return tasks;
     }
 }

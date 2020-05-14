@@ -50,11 +50,14 @@ public class DifferenceComparatorService {
         sourceJson = article.getCommentsRootNode().get("comments");
         ObjectNode difference = separateDiffComments(sourceJson, cachedJson);
         if (difference.size() > 0) {
-            log.info("Found deleted comments");
+            log.info("Found %s1 deleted comments", difference.size());
             stashComments(difference);
+            cachedJson = sourceJson;
+            log.info("Cache updated. New size is: " + cachedJson.size());
+        } else {
+            log.info("Deleted comments not found");
         }
         log.debug("process():ends");
-        log.info("Deleted comments not found");
     }
 
     ObjectNode separateDiffComments(JsonNode sourceJson, JsonNode cachedJson) {
@@ -82,7 +85,7 @@ public class DifferenceComparatorService {
             }
         }
         rootNode.set("stashed", stashed);
-        log.info(rootNode.size() + " deleted comments was found.\n", stashed);
+        log.info(rootNode.get("stashed").size() + " deleted comments was found.\n", stashed);
         log.debug("separateDiffComments():ends");
         return rootNode;
     }
@@ -119,7 +122,7 @@ public class DifferenceComparatorService {
                 log.info("Deleted comments was written to empty file");
             }
         } catch (IOException e) {
-            log.error("Some problem occurred during json reading from or writing to file ", e);
+            log.error("An error has occurred during json reading from or writing to file ", e);
         }
         // 6. close connection if needed
         log.debug("stashComments():ends");
