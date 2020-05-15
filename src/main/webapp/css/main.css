@@ -1,18 +1,26 @@
+/*Global variables block*/
+:root{
+    --global-min-height: 200px;
+}
 body {
     background-color: dimgray
 }
 
+.horizon-wrapper{
+    min-height: var(--global-min-height)+5px;
+}
+
 .inner-div-1 {
-    float: left;
-    min-width: 50%;
-    min-height: 200px;
+    float: right;
+    width: 50%;
+    min-height: var(--global-min-height);
     background-color: aquamarine
 }
 
 .inner-div-2 {
-    float: left;
-    min-width: 50%;
-    min-height: 200px;
+    float: right;
+    width: 50%;
+    min-height: var(--global-min-height);
     background-color: beige
 }
 
