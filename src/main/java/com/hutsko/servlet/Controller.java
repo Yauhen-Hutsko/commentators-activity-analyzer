@@ -43,10 +43,14 @@ public class Controller extends HttpServlet {
             scheduledPoll(watchedArticle);
         }
         if (shutdown != null ) {
-            for (BringCommentsTask task : tasks) {
-                task.getThread().interrupt();
+            for (int i = 0; i < tasks.size(); i++) {
+                BringCommentsTask task = tasks.get(i);
+                task.cancel();
+                executor.remove(task);
+                log.info("Tracking of [" + task.getName() + "] was stopped.");
             }
-            executor.shutdown();
+            tasks.removeAll(tasks);
+            resp.setStatus(HttpServletResponse.SC_OK);
         }
         // todo: create a factory that will validate url and create correct Parser.
 
@@ -57,10 +61,11 @@ public class Controller extends HttpServlet {
 
             CommentParserApiImpl parserApi = new CommentParserApiImpl(jsonAnalyzer);
             req.setAttribute("comments", jsonAnalyzer.getComments());
-            req.setAttribute("tasks", getTasks());
         }
-//        req.getRequestDispatcher("/jsp/welcome.jsp").forward(req, resp);
-        resp.sendRedirect(projectRoot + "/jsp/welcome.jsp");
+        req.getSession().setAttribute("tasks", getTasks());
+        req.getServletContext().setAttribute("servCont", 42); //test line
+        req.getRequestDispatcher("/jsp/welcome.jsp").forward(req, resp);
+//        resp.sendRedirect(projectRoot + "/jsp/welcome.jsp");
     }
 
     //TODO: implement this functionality on JSP page and test it.
@@ -68,7 +73,7 @@ public class Controller extends HttpServlet {
         BringCommentsTask task = new BringCommentsTask(url);
         tasks.add(task);
         executor.scheduleAtFixedRate(task, 0, 5, TimeUnit.MINUTES);
-        log.debug("Found tasks: (%1$s). Scheduled tasks: 2$s | 2s", tasks.size(), executor.getQueue().size());
+        log.debug("Found tasks: "+ tasks.size() + ". Scheduled tasks: " + executor.getQueue().size());
     }
 
     public ArrayList<BringCommentsTask> getTasks() {

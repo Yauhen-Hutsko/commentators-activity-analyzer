@@ -50,7 +50,7 @@ public class DifferenceComparatorService {
         sourceJson = article.getCommentsRootNode().get("comments");
         ObjectNode difference = separateDiffComments(sourceJson, cachedJson);
         if (difference.size() > 0) {
-            log.info("Found %s1 deleted comments", difference.size());
+            log.info("Found " + difference.size() + " deleted comments");
             stashComments(difference);
             cachedJson = sourceJson;
             log.info("Cache updated. New size is: " + cachedJson.size());
@@ -85,7 +85,7 @@ public class DifferenceComparatorService {
             }
         }
         rootNode.set("stashed", stashed);
-        log.info(rootNode.get("stashed").size() + " deleted comments was found.\n", stashed);
+        log.info(rootNode.get("stashed").size() + " deleted comments was found.", stashed);
         log.debug("separateDiffComments():ends");
         return rootNode;
     }
@@ -116,7 +116,7 @@ public class DifferenceComparatorService {
                 rootNode.set("stashed", storage);
                 // 5. save cache to DB
                 mapper.writeValue(f, rootNode);
-                log.info("Deleted comments was appended to file" + f.getName() + ". New quantity is: " + storage.size());
+                log.info("Deleted comments was appended to file " + f.getName() + ". New quantity is: " + storage.size());
             } else {
                 mapper.writeValue(f, deletedComments);
                 log.info("Deleted comments was written to empty file");

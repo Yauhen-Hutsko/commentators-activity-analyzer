@@ -9,9 +9,18 @@
 <body>
 <p>ver. 1.1.2</p>
 <div>
-    <div>
+    <div class="horizon-wrapper">
         <div class="inner-div-1">
-            <div>
+            <div><p></p>
+            <p> Task attribute: ${pageContext.session.getAttribute('tasks')}</p>
+            <p>paramValues: ${paramValues}</p>
+            <p>pageContext: ${pageContext}</p>
+            <p>request attributes: ${request.attributeNames}</p>
+            <p>request params: ${request.parameterNames}</p>
+            <p> Attributes: </p>
+            <c:forEach items="${param}" var="item">
+                                        <span><c:out value="${item}"/></span><br/>
+                                    </c:forEach>
                 <c:choose>
                     <c:when test="${not empty tasks}">
                         <h3>Tracked articles:</h3><br>
@@ -29,7 +38,7 @@
             <div>
                 <form id="tracked" method="get" action="controller">
                     <input type="url" name="tracked"
-                           title="Enter onliter's article URL and it will be added to watch list for moderated comments"/>
+                           title="Enter onliner's article URL and it will be added to watch list for moderated comments"/>
                     <button type="submit">Track article</button>
                 </form>
                 <form id="task" method="get" action="controller">
