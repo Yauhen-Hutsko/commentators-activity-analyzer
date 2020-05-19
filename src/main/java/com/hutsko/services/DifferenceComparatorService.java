@@ -40,23 +40,24 @@ public class DifferenceComparatorService {
     public DifferenceComparatorService(String url) {
         sourceURL = url;
         mapper = new ObjectMapper();
-        article = ArticleLoaderFactory.getInstance(url);
+        article = ArticleLoaderFactory.getInstance(sourceURL);
         cachedJson = article.getCommentsRootNode().get("comments");
     }
 
     // separate diff
     void process() {
         log.debug("DifferenceComparatorService.process():starts");
+        article = ArticleLoaderFactory.getInstance(sourceURL);
         sourceJson = article.getCommentsRootNode().get("comments");
         ObjectNode difference = separateDiffComments(sourceJson, cachedJson);
-        if (difference.size() > 0) {
-            log.info("Found " + difference.size() + " deleted comments");
+        if (difference.get("stashed").size() > 0) {
+            log.info("Found " + difference.get("stashed").size() + " deleted comments");
             stashComments(difference);
-            cachedJson = sourceJson;
-            log.info("Cache updated. New size is: " + cachedJson.size());
         } else {
             log.info("Deleted comments not found");
         }
+        cachedJson = sourceJson;
+        log.info("Cache updated. New size is: " + cachedJson.size());
         log.debug("process():ends");
     }
 

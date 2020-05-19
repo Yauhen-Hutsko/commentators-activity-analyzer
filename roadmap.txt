@@ -15,7 +15,7 @@
 + convert timestamps from String to LocalDateTime class
 + Search comments by words
 + Set up deploy to Tomcat
-- create pom-profile for redeploy project to tomcat
++ create pom-profile for redeploy project to tomcat
 + Create test-jsp
 + find out how json with comments changes after moderation
 - add some web representation of interesting data
@@ -23,11 +23,11 @@
 - implement Command pattern for servlet (v 1.1.4).
 - Refactor accordingly SOLID principles
 + turn on logging
-- implement the class for checking deleted comments
-    - write a message to logs by schedule
-    + save comments to file
-    + upload file to memory and update it with difference
-- implement reading URL from console, otherwise first line from file (for what?).
++ implement the class for checking deleted comments
+    + save comments to file.
+    + upload file to memory and update it with difference.
+    + create scheduled task.
+    + implement start\stop buttons for tracking articles.
 - JS: show an url inside input-field after submitting form.
 
 Interesting metrics:

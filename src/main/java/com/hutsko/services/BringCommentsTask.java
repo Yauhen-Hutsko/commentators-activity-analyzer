@@ -17,7 +17,7 @@ public class BringCommentsTask extends TimerTask {
 
     @Override
     public void run() {
-        log.info(service.getClass().getName() + " started.");
+        log.info(this.getClass().getName() + " started.");
         service.process();
     }
 

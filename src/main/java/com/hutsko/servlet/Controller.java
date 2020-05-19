@@ -21,7 +21,8 @@ import java.util.concurrent.TimeUnit;
 @WebServlet(name = "controller", urlPatterns = "/controller")
 public class Controller extends HttpServlet {
     private static Logger log = LoggerFactory.getLogger(Controller.class);
-    private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);;
+    private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+    ;
     private ArrayList<BringCommentsTask> tasks = new ArrayList<>();
 
     @Override
@@ -42,12 +43,15 @@ public class Controller extends HttpServlet {
         if (watchedArticle != null && !watchedArticle.isEmpty()) {
             scheduledPoll(watchedArticle);
         }
-        if (shutdown != null ) {
+        if (shutdown != null) {
+//            executor.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
+            executor.shutdownNow();
             for (int i = 0; i < tasks.size(); i++) {
                 BringCommentsTask task = tasks.get(i);
-                task.cancel();
-                executor.remove(task);
-                log.info("Tracking of [" + task.getName() + "] was stopped.");
+                task.getThread().interrupt();
+                log.info("Tracking of [" + task.getName() + "] was stopped. Thread interraption status: " + task.getThread().isInterrupted());
+                log.info("Found tasks: " + tasks.size() + ". Scheduled tasks: " + executor.getQueue().size());
+
             }
             tasks.removeAll(tasks);
             resp.setStatus(HttpServletResponse.SC_OK);
@@ -72,8 +76,8 @@ public class Controller extends HttpServlet {
     private void scheduledPoll(String url) {
         BringCommentsTask task = new BringCommentsTask(url);
         tasks.add(task);
-        executor.scheduleAtFixedRate(task, 0, 5, TimeUnit.MINUTES);
-        log.debug("Found tasks: "+ tasks.size() + ". Scheduled tasks: " + executor.getQueue().size());
+        executor.scheduleAtFixedRate(task, 0, 1, TimeUnit.MINUTES);
+        log.info("Found tasks: " + tasks.size() + ". Scheduled tasks: " + executor.getQueue().size());
     }
 
     public ArrayList<BringCommentsTask> getTasks() {

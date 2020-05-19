@@ -7,7 +7,7 @@
 </head>
 
 <body>
-<p>ver. 1.1.2</p>
+<p>ver. 1.2.0</p>
 <div>
     <div class="horizon-wrapper">
         <div class="inner-div-1">
