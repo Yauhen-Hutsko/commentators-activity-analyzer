@@ -29,16 +29,23 @@
     + create scheduled task.
     + implement start\stop buttons for tracking articles.
 - JS: show an url inside input-field after submitting form.
+- Fix the mechanism of searching deleted comments (seems like currently sub-comments don't look at).
+- Fix mechanism of storage deleted cubcomments (now json have doubles)
 
 Interesting metrics:
  1. How many days after publishing do ppl write comments
- 2. How much likes\dislikes get the most active commentator
+ 2. +How much likes\dislikes get the most active commentator
  3. A sex of the most active commentator(and a sex of a hero of an article). How it corresponds with a protagonist?
  4. A gap between an article issue and the first\last comment was left.
  5. Map of daytime activity by a commentator.
- 6. Analyze difference and find deleted/changed comments.
+ 6. +Analyze difference and find deleted/changed comments.
  7. Find all user activity (multi-article analysis).
- 8. Recognize a troll-activity under politic articles.
+ 8. Recognize a troll-activity under politic articles - newly created accounts, commenting only political articles.
  9. Compare user comments regarding one topic at different time (e.g. seryoga).
- 10. Add ML to recognize comments 'mood' and find other comment of author written under pseudonyms.
+ 10. Was the best comment changed?
  11. Move the project to AEM.
+ 12. Create an index of all users.
+
+ Other ideas:
+ - Telegram-bot which will show analytic for articles.
+ - Add ML to recognize comments 'mood' and find other comment of author written under pseudonyms.

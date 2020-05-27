@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 public class Controller extends HttpServlet {
     private static Logger log = LoggerFactory.getLogger(Controller.class);
     private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-    ;
     private ArrayList<BringCommentsTask> tasks = new ArrayList<>();
 
     @Override
@@ -49,7 +48,7 @@ public class Controller extends HttpServlet {
             for (int i = 0; i < tasks.size(); i++) {
                 BringCommentsTask task = tasks.get(i);
                 task.getThread().interrupt();
-                log.info("Tracking of [" + task.getName() + "] was stopped. Thread interraption status: " + task.getThread().isInterrupted());
+                log.info("Tracking of [" + task.getName() + "] was stopped. Thread interruption status: " + task.getThread().isInterrupted());
                 log.info("Found tasks: " + tasks.size() + ". Scheduled tasks: " + executor.getQueue().size());
 
             }
