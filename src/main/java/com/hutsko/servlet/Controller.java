@@ -14,7 +14,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -22,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class Controller extends HttpServlet {
     private static Logger log = LoggerFactory.getLogger(Controller.class);
     private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-    private ArrayList<BringCommentsTask> tasks = new ArrayList<>();
+    private Map<String, BringCommentsTask> tasks = new HashMap<>();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -38,22 +39,28 @@ public class Controller extends HttpServlet {
         log.debug("Controller invoked.");
         String projectRoot = req.getContextPath();
         String watchedArticle = req.getParameter("tracked");
-        String shutdown = req.getParameter("shutdownTasks");
+        String interval = req.getParameter("interval");
+        String shutdownAll = req.getParameter("shutdownAllTasks");
+        String stopOne = req.getParameter("stop-follow");
         if (watchedArticle != null && !watchedArticle.isEmpty()) {
-            scheduledPoll(watchedArticle);
+            scheduledPoll(watchedArticle, Integer.valueOf(interval));
         }
-        if (shutdown != null) {
+        if (shutdownAll != null) {
 //            executor.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
             executor.shutdownNow();
-            for (int i = 0; i < tasks.size(); i++) {
-                BringCommentsTask task = tasks.get(i);
-                task.getThread().interrupt();
-                log.info("Tracking of [" + task.getName() + "] was stopped. Thread interruption status: " + task.getThread().isInterrupted());
-                log.info("Found tasks: " + tasks.size() + ". Scheduled tasks: " + executor.getQueue().size());
-
+            for (BringCommentsTask value : tasks.values()) {
+                value.getThread().interrupt();
+                log.info("Tracking of [" + value.getName() + "] was stopped. Thread interruption status: " + value.getThread().isInterrupted());
             }
-            tasks.removeAll(tasks);
+            tasks.clear();
+            log.info("Found tasks: " + tasks.size() + ". Scheduled tasks: " + executor.getQueue().size());
             resp.setStatus(HttpServletResponse.SC_OK);
+        }
+        if (stopOne != null) {
+            BringCommentsTask task = tasks.get(stopOne);
+            task.cancel();
+            tasks.remove(stopOne);
+            log.info("The article " + task.getName() + " not tracked anymore. Stopped by user.");
         }
         // todo: create a factory that will validate url and create correct Parser.
 
@@ -72,14 +79,18 @@ public class Controller extends HttpServlet {
     }
 
     //TODO: implement this functionality on JSP page and test it.
-    private void scheduledPoll(String url) {
+    private void scheduledPoll(String url, int interval) {
         BringCommentsTask task = new BringCommentsTask(url);
-        tasks.add(task);
-        executor.scheduleAtFixedRate(task, 0, 1, TimeUnit.MINUTES);
-        log.info("Found tasks: " + tasks.size() + ". Scheduled tasks: " + executor.getQueue().size());
+        if (!tasks.containsKey(url)) {
+            tasks.put(url, task);
+            executor.scheduleAtFixedRate(task, 0, interval, TimeUnit.MINUTES);
+            log.info("Found tasks: " + tasks.size() + ". Scheduled tasks: " + executor.getQueue().size());
+        } else {
+            log.info("Article " + task.getName() + " is already tracking. Stop previous tracking before add new one.");
+        }
     }
 
-    public ArrayList<BringCommentsTask> getTasks() {
+    public Map<String, BringCommentsTask> getTasks() {
         return tasks;
     }
 }

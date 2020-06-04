@@ -12,21 +12,29 @@
     <div class="horizon-wrapper">
         <div class="inner-div-1">
             <div><p></p>
-            <p> Task attribute: ${pageContext.session.getAttribute('tasks')}</p>
-            <p>paramValues: ${paramValues}</p>
-            <p>pageContext: ${pageContext}</p>
-            <p>request attributes: ${request.attributeNames}</p>
-            <p>request params: ${request.parameterNames}</p>
-            <p> Attributes: </p>
-            <c:forEach items="${param}" var="item">
-                                        <span><c:out value="${item}"/></span><br/>
-                                    </c:forEach>
+                <p> Task attribute: ${pageContext.session.getAttribute('tasks')}</p>
+                <p>ParamValues: ${paramValues}</p>
+                <p>PageContext: ${pageContext}</p>
+                <p>Request attributes: ${request.attributeNames}</p>
+                <p>Request params: ${request.parameterNames}</p>
+                <p>Attributes: </p>
+                <p>ServletContext: ${servletContext.getAttribute('servCont')}
+                <p>Params:</p>
+                <c:forEach items="${param}" var="item">
+                    <span><c:out value="${item}"/></span><br/>
+                </c:forEach>
                 <c:choose>
                     <c:when test="${not empty tasks}">
-                        <h3>Tracked articles:</h3><br>
-                        <c:forEach items="${tasks}" var="task">
-                            <span><c:out value="${task.name}"/></span><br/>
-                        </c:forEach>
+                    <h3>Tracked articles:</h3><br>
+                    <c:forEach items="${tasks}" var="task">
+                        <span>
+                        <b>${task.value.name}</b>
+                        <button type="submit" form="show-deleted" name="show-deleted" value="${task.key}">Show deleted</button>
+                        <button type="submit" form="stop-follow" name="stop-follow" value="${task.key}">Stop following</button>
+                        <a href="${task.key}" target="_blank">Go to article.</a>
+                        </span>
+                        <br/>
+                    </c:forEach>
                     </c:when>
                     <c:otherwise>
                         <p>Tracked articles not found.</p>
@@ -39,11 +47,13 @@
                 <form id="tracked" method="get" action="controller">
                     <input type="url" name="tracked"
                            title="Enter onliner's article URL and it will be added to watch list for moderated comments"/>
+                    <input type="text" name="interval" title="Enter polling interval in minutes. Max 999"
+                           pattern="\d{1,3}" style="width: 27" required/>
                     <button type="submit">Track article</button>
                 </form>
                 <form id="task" method="get" action="controller">
-                    <input type="hidden" name="shutdownTasks"/>
-                    <button type="submit">Shutdown Tasks</button>
+                    <input type="hidden" name="shutdownAllTasks"/>
+                    <button type="submit">Shutdown All Tasks</button>
                 </form>
             </div>
         </div>
@@ -78,5 +88,9 @@
         </div>
     </div>
 </div>
+    <form id="show-deleted" method="get" action="controller">
+    </form>
+    <form id="stop-follow" method="get" action="controller">
+    </form>
 </body>
 </html>
