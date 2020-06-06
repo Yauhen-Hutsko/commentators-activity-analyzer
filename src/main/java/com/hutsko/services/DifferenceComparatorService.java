@@ -31,9 +31,12 @@ public class DifferenceComparatorService {
     public static final String TOMCAT_RESOURCE_FOLDER = "../GADB/";
 
     private String sourceURL;
-    private ArticleLoader article;
-    private JsonNode sourceJson;
+    private int totalComments;
+    private int views;
+    private int deletedComments;
+    private JsonNode freshJson;
     private JsonNode cachedJson;
+    private ArticleLoader article;
     private ObjectMapper mapper;
     private JsonNode c; // uses like a buffer for recursive method. Can be convert to local if replace recursion with if-statement
 
@@ -48,20 +51,22 @@ public class DifferenceComparatorService {
     void process() {
         log.debug("DifferenceComparatorService.process():starts");
         article = ArticleLoaderFactory.getInstance(sourceURL);
-        sourceJson = article.getCommentsRootNode().get("comments");
-        ObjectNode difference = separateDiffComments(sourceJson, cachedJson);
+        totalComments = article.getCommentsRootNode().get("total").asInt();
+        views = Integer.parseInt(article.getViews().replaceAll("[^\\d]", "")); //parsed from raw html data
+        freshJson = article.getCommentsRootNode().get("comments");
+        ObjectNode difference = separateDiffComments(freshJson, cachedJson);
         if (difference.get("stashed").size() > 0) {
             log.info("Found " + difference.get("stashed").size() + " deleted comments");
             stashComments(difference);
         } else {
             log.info("Deleted comments not found");
         }
-        cachedJson = sourceJson;
+        cachedJson = freshJson;
         log.info("Cache updated. New size is: " + cachedJson.size());
         log.debug("process():ends");
     }
 
-    ObjectNode separateDiffComments(JsonNode sourceJson, JsonNode cachedJson) {
+    ObjectNode separateDiffComments(JsonNode freshJson, JsonNode cachedJson) {
         log.debug("separateDiffComments():starts");
 
         if (!cachedJson.elements().hasNext()) {
@@ -73,7 +78,7 @@ public class DifferenceComparatorService {
         ObjectNode stashed = mapper.createObjectNode();
 
         c = mapper.createObjectNode(); //bad solution
-        for (JsonNode entry : includeSubComments(sourceJson)) {
+        for (JsonNode entry : includeSubComments(freshJson)) {
             sourceCommentsId.add(entry.get("id").toString());
         }
         log.info(sourceCommentsId.size() + " comments read from source.");
@@ -158,6 +163,15 @@ public class DifferenceComparatorService {
             ((ObjectNode) c).set(jsonNode.get("id").toString(), jsonNode);
         }
         return c;
+    }
+
+
+    public int getTotalComments() {
+        return totalComments;
+    }
+
+    public int getViews() {
+        return views;
     }
 }
 

@@ -7,7 +7,7 @@
 </head>
 
 <body>
-<p>ver. 1.2.0</p>
+<p>ver. 1.2.1</p>
 <div>
     <div class="horizon-wrapper">
         <div class="inner-div-1">
@@ -29,6 +29,9 @@
                     <c:forEach items="${tasks}" var="task">
                         <span>
                         <b>${task.value.name}</b>
+                        <text>views: ${task.value.views}.</text>
+                        <text>comments: ${task.value.total}.</text>
+                        <b>PoV(%): ${task.value.involvedPercent}.</b>
                         <button type="submit" form="show-deleted" name="show-deleted" value="${task.key}">Show deleted</button>
                         <button type="submit" form="stop-follow" name="stop-follow" value="${task.key}">Stop following</button>
                         <a href="${task.key}" target="_blank">Go to article.</a>
@@ -59,7 +62,6 @@
         </div>
       </div>
   <div class="inner-div-3">
-      <p>Hello boomer.</p>
       <jsp:useBean id="api" scope="page" class="com.hutsko.impl.CommentParserApiImpl"/>
       <strong>
   	<jsp:text>Old value:</jsp:text>
@@ -70,7 +72,7 @@
 
         <div>
             <form id="messages" method="get" action="controller">
-                <input type="url" name="articleURL" title="Enter onliter's article URL"/>
+                <input type="url" name="articleURL" title="Enter onliter's article URL" required/>
                 <button type="submit">Show statistic</button>
             </form>
         </div>

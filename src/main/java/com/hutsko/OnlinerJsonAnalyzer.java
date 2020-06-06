@@ -2,7 +2,6 @@ package com.hutsko;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hutsko.entity.Comment;
 import com.hutsko.entity.User;
 import org.slf4j.Logger;
@@ -25,12 +24,10 @@ public class OnlinerJsonAnalyzer implements JsonAnalyzer {
     private final List<Comment> comments = new ArrayList<>();
     private final Map<Integer, User> users = new HashMap<>();
     private ObjectMapper mapper = new ObjectMapper();
-    private int totalBeforeModeration;
 
     public OnlinerJsonAnalyzer(JsonNode jsonNode) {
         fillComments(jsonNode);
         fillCommentators();
-        totalBeforeModeration = jsonNode.get("total").asInt();
     }
 
     /**
@@ -42,10 +39,6 @@ public class OnlinerJsonAnalyzer implements JsonAnalyzer {
 
     public Map<Integer, User> getCommentators() {
         return users;
-    }
-
-    public int getTotalBeforeModeration() {
-        return totalBeforeModeration;
     }
 
     public int getTotalAfterModeration() {
@@ -99,7 +92,7 @@ public class OnlinerJsonAnalyzer implements JsonAnalyzer {
                 comment = mapper.readValue(node.toString(), Comment.class);
             } catch (IOException e) {
                 log.error("Cannot map the value from json node to Comment.class", e);
-                }
+            }
             comments.add(comment);
         }
         return comments;

@@ -21,10 +21,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 public class OnlinerArticleLoader implements ArticleLoader {
+
+    private static final String DOM_CLASS_OF_VIEWS = "news-header__button_views";
     private static Logger log = LoggerFactory.getLogger(OnlinerArticleLoader.class);
     private static final int QUANTITY_OF_LAST_COMMENTS = 99999;
     private String sourceURL;
     private String title;
+    private String views;
     private LocalDateTime created;
     private JsonNode commentsRootNode;
 
@@ -36,19 +39,8 @@ public class OnlinerArticleLoader implements ArticleLoader {
         commentsRootNode = uploadFullJsonFromURL(extractUrlForGettingComments(HTMLDoc));
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public LocalDateTime getCreated() {
-        return created;
-    }
-
-    public JsonNode getCommentsRootNode() {
-        return commentsRootNode;
-    }
-
-    Document readHtmlPageSourceCode() {
+    @Override
+    public Document readHtmlPageSourceCode() {
         Document document = null;
         try {
             document = Jsoup.connect(sourceURL).get();
@@ -59,6 +51,7 @@ public class OnlinerArticleLoader implements ArticleLoader {
     }
 
     //TODO: NPE hazard
+    @Override
     public JsonNode uploadFullJsonFromURL(String httpsRequestUrl) {
         StringBuilder stringBuilder = new StringBuilder();
         JsonNode commentsNode = null;
@@ -76,11 +69,31 @@ public class OnlinerArticleLoader implements ArticleLoader {
             ObjectMapper mapper = new ObjectMapper();
             commentsNode = mapper.readTree(stringBuilder.toString());
         } catch (MalformedURLException e) {
-            log.error("Can't parse the URL string \"" + httpsRequestUrl + "\"", e);
+            log.error("Can't parse this URL \"" + httpsRequestUrl + "\"", e);
         } catch (IOException e) {
             log.error("Error occurred around BufferedReader. ", e);
         }
         return commentsNode;
+    }
+
+    @Override
+    public String getTitle() {
+        return title;
+    }
+
+    @Override
+    public String getViews() {
+        return views;
+    }
+
+    @Override
+    public LocalDateTime getCreated() {
+        return created;
+    }
+
+    @Override
+    public JsonNode getCommentsRootNode() {
+        return commentsRootNode;
     }
 
     private String extractUrlForGettingComments(Document document) {
@@ -90,7 +103,8 @@ public class OnlinerArticleLoader implements ArticleLoader {
     }
 
     private void setMetaData(Document document) {
-        this.title = !document.title().isEmpty() ? document.title() : "not found";
+        title = !document.title().isEmpty() ? document.title() : "not found";
+        views = document.getElementsByClass(DOM_CLASS_OF_VIEWS).first().childNode(0).toString();
         String creationDate = document.getElementsByAttributeValue("name", "article:published_time").first().attr("content");
         if (!creationDate.isEmpty()) {
             this.created = LocalDateTime.parse(creationDate, DateTimeFormatter.ofPattern(

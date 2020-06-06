@@ -46,7 +46,6 @@ public class Controller extends HttpServlet {
             scheduledPoll(watchedArticle, Integer.valueOf(interval));
         }
         if (shutdownAll != null) {
-//            executor.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
             executor.shutdownNow();
             for (BringCommentsTask value : tasks.values()) {
                 value.getThread().interrupt();
@@ -54,13 +53,16 @@ public class Controller extends HttpServlet {
             }
             tasks.clear();
             log.info("Found tasks: " + tasks.size() + ". Scheduled tasks: " + executor.getQueue().size());
+            log.info("Approximate number of threads that are actively executing tasks: " + executor.getActiveCount());
             resp.setStatus(HttpServletResponse.SC_OK);
         }
         if (stopOne != null) {
             BringCommentsTask task = tasks.get(stopOne);
             task.cancel();
             tasks.remove(stopOne);
+            executor.purge();
             log.info("The article " + task.getName() + " not tracked anymore. Stopped by user.");
+            log.info("Found tasks: " + tasks.size() + ". Scheduled tasks: " + executor.getQueue().size());
         }
         // todo: create a factory that will validate url and create correct Parser.
 

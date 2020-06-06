@@ -1,0 +1,3 @@
+v.1.0 - Console app. Basic functional implemented: url->html->json parsing. Mapping data to javaBeans.
+v.1.2.0 - Comparator Service works - tasks may be added and removed. Scheduler saves deleted comments into file.
+

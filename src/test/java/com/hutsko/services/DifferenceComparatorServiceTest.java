@@ -17,7 +17,7 @@ import java.io.IOException;
 @RunWith(MockitoJUnitRunner.class)
 public class DifferenceComparatorServiceTest {
 
-    private JsonNode sourceJson;
+    private JsonNode freshJson;
     private JsonNode cachedJson;
     private JsonNode oneComment;
     private JsonNode forStash;
@@ -29,14 +29,14 @@ public class DifferenceComparatorServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        sourceJson = mapper.readTree(new File("src/test/resources/source.json")).get("comments");
+        freshJson = mapper.readTree(new File("src/test/resources/source.json")).get("comments");
         cachedJson = mapper.readTree(new File("src/test/resources/cached.json")).get("comments");
         oneComment = mapper.readTree(new File("src/test/resources/oneComment.json")).get("comments");
         forStash = mapper.readTree(new File("src/test/resources/forStash.json"));
         stashAppend = mapper.readTree(new File("src/test/resources/stashAppend.json"));
         stashed = "src/test/resources/muzykant-v-it.json";
         Whitebox.setInternalState(service, "cachedJson", cachedJson);
-        Whitebox.setInternalState(service, "sourceJson", sourceJson);
+        Whitebox.setInternalState(service, "freshJson", freshJson);
 
     }
 
@@ -47,20 +47,27 @@ public class DifferenceComparatorServiceTest {
     }
 
     @Test
+    public void count_all_entries() { // Test that lambda-exp is counting correctly.
+        int onlyCommentNodes = (int)cachedJson.findValues("id").stream().filter(JsonNode::isTextual).count();
+        Assert.assertEquals(29, cachedJson.findValues("id").size());
+        Assert.assertEquals(13, onlyCommentNodes);
+    }
+
+    @Test
     public void separateDiffComments_should_find_three_comments() {
-        ObjectNode root = service.separateDiffComments(sourceJson, cachedJson);
+        ObjectNode root = service.separateDiffComments(freshJson, cachedJson);
         Assert.assertEquals(3, root.get("stashed").size());
     }
 
     @Test
     public void separateDiffComments_should_not_find_any_comment() throws IOException {
-        ObjectNode root = service.separateDiffComments(sourceJson, sourceJson);
+        ObjectNode root = service.separateDiffComments(freshJson, freshJson);
         Assert.assertEquals(0, root.get("stashed").size());
     }
 
     @Test
     public void separateDiffComments_should_add_every_comment() throws IOException {
-        ObjectNode root = service.separateDiffComments(oneComment, sourceJson);
+        ObjectNode root = service.separateDiffComments(oneComment, freshJson);
         Assert.assertEquals(12, root.get("stashed").size());
 
     }
