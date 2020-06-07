@@ -22,6 +22,7 @@
         <servlet.jsp.version>LATEST</servlet.jsp.version>
         <jsoup.version>1.11.3</jsoup.version>
         <junit.version>4.11</junit.version>
+        <powermock.version>2.0.2</powermock.version>
         <jsonPath.version>2.4.0</jsonPath.version>
         <jackson.version>2.9.9</jackson.version>
         <jackson.bind.version>2.9.10.4</jackson.bind.version>
@@ -183,6 +184,19 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <!--mocks-->
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>1.7.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <version>1.7.4</version>
+            <scope>test</scope>
+        </dependency>
         <!-- library for getting data from json via regExp -->
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
@@ -203,12 +217,6 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.bind.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>jstl</groupId>
@@ -232,7 +240,7 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>${log4j.version}</version>
-            <scope>compile</scope> <!-- Don't user 'test' scope. 'Compile' allows to deploy log4j jar's to Tomcat-->
+            <scope>compile</scope> <!-- Don't use 'test' scope. 'Compile' allows to deploy log4j jar's to Tomcat-->
         </dependency>
     </dependencies>
 </project>
