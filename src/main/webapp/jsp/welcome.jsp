@@ -7,18 +7,15 @@
 </head>
 
 <body>
-<p>ver. 1.2.1</p>
+<p>ver. 1.2.4</p>
 <div>
     <div class="horizon-wrapper">
         <div class="inner-div-1">
             <div><p></p>
-                <p> Task attribute: ${pageContext.session.getAttribute('tasks')}</p>
                 <p>ParamValues: ${paramValues}</p>
-                <p>PageContext: ${pageContext}</p>
                 <p>Request attributes: ${request.attributeNames}</p>
                 <p>Request params: ${request.parameterNames}</p>
-                <p>Attributes: </p>
-                <p>ServletContext: ${servletContext.getAttribute('servCont')}
+                <p>Saved in ServletContext: ${servletContext.getAttribute('servCont')}
                 <p>Params:</p>
                 <c:forEach items="${param}" var="item">
                     <span><c:out value="${item}"/></span><br/>
@@ -31,9 +28,9 @@
                         <b>${task.value.name}</b>
                         <text>views: ${task.value.views}.</text>
                         <text>comments: ${task.value.total}.</text>
-                        <b>PoV(%): ${task.value.involvedPercent}.</b>
+                        <b>PoI(%): ${task.value.involvedPercent}(${task.value.trueInvolvedPercent}).</b>
                         <button type="submit" form="show-deleted" name="show-deleted" value="${task.key}">Show deleted</button>
-                        <button type="submit" form="stop-follow" name="stop-follow" value="${task.key}">Stop following</button>
+                        <button type="submit" form="stop-follow" name="stopFollow" value="${task.key}">Stop following</button>
                         <a href="${task.key}" target="_blank">Go to article.</a>
                         </span>
                         <br/>
@@ -48,6 +45,7 @@
         <div class="inner-div-2">
             <div>
                 <form id="tracked" method="get" action="controller">
+                    <input type="hidden" name="command" value="track">
                     <input type="url" name="tracked"
                            title="Enter onliner's article URL and it will be added to watch list for moderated comments"/>
                     <input type="text" name="interval" title="Enter polling interval in minutes. Max 999"
@@ -55,7 +53,7 @@
                     <button type="submit">Track article</button>
                 </form>
                 <form id="task" method="get" action="controller">
-                    <input type="hidden" name="shutdownAllTasks"/>
+                    <input type="hidden" name="command" value="shutdownAll">
                     <button type="submit">Shutdown All Tasks</button>
                 </form>
             </div>
@@ -72,6 +70,7 @@
 
         <div>
             <form id="messages" method="get" action="controller">
+                <input type="hidden" name="command" value="showStats">
                 <input type="url" name="articleURL" title="Enter onliter's article URL" required/>
                 <button type="submit">Show statistic</button>
             </form>
@@ -83,7 +82,7 @@
                 <h2>All comments below</h2>
                 <br>
                 <c:forEach items="${comments}" var="comment">
-                    <c:out value="${comment}"/>
+                    <c:out value="${comment.text}"/>
                     <br/>
                 </c:forEach>
             </c:if>
@@ -91,8 +90,10 @@
     </div>
 </div>
     <form id="show-deleted" method="get" action="controller">
+    <input type="hidden" name="command" value="show-deleted">
     </form>
     <form id="stop-follow" method="get" action="controller">
+    <input type="hidden" name="command" value="stopFollow">
     </form>
 </body>
 </html>

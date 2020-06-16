@@ -20,7 +20,7 @@
 + find out how json with comments changes after moderation
 - add some web representation of interesting data (separate article tracking, views, comments, deleted comments)
 - add save project version number in property file and use in pom and jsp.
-- implement Command pattern for servlet (v 1.1.4).
++ implement Command pattern for servlet (v 1.2.4).
 - add to stashed-json fields: total, created, lastModified, involvement, tracked form N comments.
 - Refactor accordingly SOLID principles
 + turn on logging
