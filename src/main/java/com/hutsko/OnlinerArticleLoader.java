@@ -21,9 +21,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 public class OnlinerArticleLoader implements ArticleLoader {
+    private static Logger log = LoggerFactory.getLogger(OnlinerArticleLoader.class);
 
     private static final String DOM_CLASS_OF_VIEWS = "news-header__button_views";
-    private static Logger log = LoggerFactory.getLogger(OnlinerArticleLoader.class);
     private static final int QUANTITY_OF_LAST_COMMENTS = 99999;
     private String sourceURL;
     private String title;
@@ -45,6 +45,7 @@ public class OnlinerArticleLoader implements ArticleLoader {
         try {
             document = Jsoup.connect(sourceURL).get();
         } catch (IOException e) {
+            log.error("Couldn't connect to " + sourceURL);
             System.err.println(e.getMessage());
         }
         return document;

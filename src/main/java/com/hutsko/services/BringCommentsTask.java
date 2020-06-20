@@ -46,4 +46,13 @@ public class BringCommentsTask extends TimerTask {
         String s = String.format("%.2f %n", involved);
         return Float.valueOf(s);
     }
+
+    public float getTrueInvolvedPercent(){
+        if (service.getViews() == 0) {
+            return 0;
+        }
+        float involved = (float)((service.getTotalComments()+service.getDeletedComments())*100)/service.getViews();
+        String s = String.format("%.2f %n", involved);
+        return Float.valueOf(s);
+    }
 }

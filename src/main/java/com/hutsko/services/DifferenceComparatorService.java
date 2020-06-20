@@ -27,9 +27,8 @@ import java.util.Map;
  * note: TODO:#Mustithread - every article has its own thread
  */
 public class DifferenceComparatorService {
-    private static Logger log = LoggerFactory.getLogger(DifferenceComparatorService.class.getName());
     public static final String TOMCAT_RESOURCE_FOLDER = "../GADB/";
-
+    private static Logger log = LoggerFactory.getLogger(DifferenceComparatorService.class);
     private String sourceURL;
     private int totalComments;
     private int views;
@@ -47,7 +46,6 @@ public class DifferenceComparatorService {
         cachedJson = article.getCommentsRootNode().get("comments");
     }
 
-    // separate diff
     void process() {
         log.debug("DifferenceComparatorService.process():starts");
         article = ArticleLoaderFactory.getInstance(sourceURL);
@@ -91,12 +89,11 @@ public class DifferenceComparatorService {
             }
         }
         rootNode.set("stashed", stashed);
-        log.info(rootNode.get("stashed").size() + " deleted comments was found.", stashed);
         log.debug("separateDiffComments():ends");
         return rootNode;
     }
 
-    void stashComments(JsonNode deletedComments) {
+    void stashComments(JsonNode deletedCommentsNode) {
         log.debug("stashComments():starts");
         // 4. open connection to DB(txt.file) and upload json for rewriting
         // Use name of the article from URL for file naming
@@ -109,22 +106,26 @@ public class DifferenceComparatorService {
                 log.error("Can't create a file " + f.getName() + " under the path " + f.getPath(), e);
             }
         }
+        JsonNode forStashNode = deletedCommentsNode.get("stashed");
         try {
             if (f.length() != 0) { //main scenario
                 JsonNode storage = mapper.readTree(f).get("stashed");
                 log.debug("Loaded " + storage.size() + " from storage.");
-                Iterator<Map.Entry<String, JsonNode>> iterator = deletedComments.get("stashed").fields();
-                ObjectNode rootNode = mapper.createObjectNode();
+                Iterator<Map.Entry<String, JsonNode>> iterator = forStashNode.fields();
                 while (iterator.hasNext()) {
                     Map.Entry i = iterator.next();
                     ((ObjectNode) storage).set(i.getKey().toString(), (JsonNode) i.getValue());
                 }
+                deletedComments += forStashNode.size();
+
+                ObjectNode rootNode = mapper.createObjectNode();
                 rootNode.set("stashed", storage);
+                rootNode.put("deletedTotal", deletedComments);
                 // 5. save cache to DB
                 mapper.writeValue(f, rootNode);
                 log.info("Deleted comments was appended to file " + f.getName() + ". New quantity is: " + storage.size());
             } else {
-                mapper.writeValue(f, deletedComments);
+                mapper.writeValue(f, deletedCommentsNode);
                 log.info("Deleted comments was written to empty file");
             }
         } catch (IOException e) {
@@ -172,6 +173,10 @@ public class DifferenceComparatorService {
 
     public int getViews() {
         return views;
+    }
+
+    public int getDeletedComments() {
+        return deletedComments;
     }
 }
 
