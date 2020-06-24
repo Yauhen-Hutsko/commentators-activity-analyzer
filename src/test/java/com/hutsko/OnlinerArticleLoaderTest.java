@@ -1,6 +1,7 @@
 package com.hutsko;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hutsko.util.JsonProcessing;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
@@ -62,7 +63,7 @@ public class OnlinerArticleLoaderTest {
 
     @Test
     public void testUploadComments() throws IOException {
-        JsonNode node = parser.uploadFullJsonFromURL("https://comments.api.onliner.by/news/tech.post/414510/comments?limit=99999");
+        JsonNode node = JsonProcessing.uploadJsonFromURL("https://comments.api.onliner.by/news/tech.post/414510/comments?limit=99999");
         Assert.assertEquals(node.size(), 6);
     }
 }

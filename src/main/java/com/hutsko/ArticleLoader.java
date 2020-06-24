@@ -17,5 +17,4 @@ public interface ArticleLoader {
 
     Document readHtmlPageSourceCode();
 
-    JsonNode uploadFullJsonFromURL(String httpsRequestUrl);
 }

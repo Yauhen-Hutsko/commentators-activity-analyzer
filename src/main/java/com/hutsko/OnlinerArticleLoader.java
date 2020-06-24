@@ -2,6 +2,7 @@ package com.hutsko;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hutsko.util.JsonProcessing;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -21,10 +22,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 public class OnlinerArticleLoader implements ArticleLoader {
-
     private static final String DOM_CLASS_OF_VIEWS = "news-header__button_views";
-    private static Logger log = LoggerFactory.getLogger(OnlinerArticleLoader.class);
     private static final int QUANTITY_OF_LAST_COMMENTS = 99999;
+    private static Logger log = LoggerFactory.getLogger(OnlinerArticleLoader.class);
     private String sourceURL;
     private String title;
     private String views;
@@ -36,7 +36,7 @@ public class OnlinerArticleLoader implements ArticleLoader {
         this.sourceURL = sourceURL;
         Document HTMLDoc = readHtmlPageSourceCode();
         setMetaData(HTMLDoc);
-        commentsRootNode = uploadFullJsonFromURL(extractUrlForGettingComments(HTMLDoc));
+        commentsRootNode = JsonProcessing.uploadJsonFromURL(extractUrlForGettingComments(HTMLDoc));
     }
 
     @Override
@@ -48,32 +48,6 @@ public class OnlinerArticleLoader implements ArticleLoader {
             System.err.println(e.getMessage());
         }
         return document;
-    }
-
-    //TODO: NPE hazard
-    @Override
-    public JsonNode uploadFullJsonFromURL(String httpsRequestUrl) {
-        StringBuilder stringBuilder = new StringBuilder();
-        JsonNode commentsNode = null;
-        try {
-            URL url = new URL(httpsRequestUrl);
-            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            String inputLine = "";
-            if (connection != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                while ((inputLine = reader.readLine()) != null) {
-                    stringBuilder.append(inputLine);
-                }
-                reader.close();
-            }
-            ObjectMapper mapper = new ObjectMapper();
-            commentsNode = mapper.readTree(stringBuilder.toString());
-        } catch (MalformedURLException e) {
-            log.error("Can't parse this URL \"" + httpsRequestUrl + "\"", e);
-        } catch (IOException e) {
-            log.error("Error occurred around BufferedReader. ", e);
-        }
-        return commentsNode;
     }
 
     @Override
