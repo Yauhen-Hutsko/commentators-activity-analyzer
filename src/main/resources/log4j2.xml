@@ -5,6 +5,9 @@
         <File name="file" fileName="../logs/main.log">
             <PatternLayout pattern="%d{DATE} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
+        <File name="file2" fileName="../logs/services.log">
+            <PatternLayout pattern="%d{DATE} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
         <Console name="console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
@@ -13,6 +16,9 @@
         <!--name for logger mustn't contain regExp symbols like com.hutsko.*-->
         <Logger name="com.hutsko" level="info" additivity="false">
             <AppenderRef ref="file"/>
+        </Logger>
+        <Logger name="com.hutsko.util.OnlinerUsers" level="info" additivity="false">
+            <AppenderRef ref="file2"/>
         </Logger>
         <Root level="error">
             <AppenderRef ref="console"/>

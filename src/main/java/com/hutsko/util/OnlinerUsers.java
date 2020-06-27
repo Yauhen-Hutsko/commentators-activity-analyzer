@@ -7,12 +7,16 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 
 public class OnlinerUsers {
+    private static final Logger log = LoggerFactory.getLogger(OnlinerUsers.class);
+
     private static final String RATING_ONLINER_DOMAIN = "https://rating.onliner.by";
     private static final String RATING_ALL_USERS = "https://rating.onliner.by/rating/users?type=overall";
     private static final String PROFILE_USER_API = "https://profile.onliner.by/sdapi/user.api/users/";
@@ -38,8 +42,8 @@ public class OnlinerUsers {
     public void obtainUserProfileURLs() {
         long startTime = System.currentTimeMillis();
         do {
+            parseHtmlPage();
             String nextPageAbsolutePath = RATING_ONLINER_DOMAIN + nextPageRelativePath;
-            readHtmlPage();
             sourceHTML = readHtmlPageSourceCode(nextPageAbsolutePath);
         } while (!nextPageRelativePath.isEmpty());
 
@@ -63,7 +67,7 @@ public class OnlinerUsers {
         return false;
     }
 
-    private void readHtmlPage() {
+    private void parseHtmlPage() {
         Element result = sourceHTML.getElementsByClass("next-page").first();
         if (result != null) {
             nextPageRelativePath = result.getElementsByTag("a").first().attr("href");
@@ -73,12 +77,11 @@ public class OnlinerUsers {
         Elements users = sourceHTML.getElementsByClass("user");
         for (Element user : users) {
             String profilePath = user.attr("href");
-//            String userApiUrl = PROFILE_USER_API + profilePath.substring(profilePath.lastIndexOf('/'));
             String userId = profilePath.substring(profilePath.lastIndexOf('/') + 1);
             userProfiles.add(userId);
 //            JsonNode userNode;
 //            userNode = JsonProcessing.uploadJsonFromURL(userApiUrl);
-//            rootNode.set(profilePath, userNode);
+//            rootNode.set(userId, userNode);
         }
     }
 
@@ -90,6 +93,7 @@ public class OnlinerUsers {
         Document document = null;
         try {
             document = Jsoup.connect(pageUrl).get();
+            System.out.println("Page " + pageUrl + " was read.");
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
