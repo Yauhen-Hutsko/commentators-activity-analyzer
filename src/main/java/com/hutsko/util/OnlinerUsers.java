@@ -1,35 +1,32 @@
 package com.hutsko.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
+import java.time.Duration;
 
 public class OnlinerUsers {
-    private static final String ONLINER_DOMAIN = "https://rating.onliner.by";
-    private static final String URL_ALL_USERS = "https://rating.onliner.by/rating/users?type=overall";
-    private static final String URL_USER_API = "https://profile.onliner.by/sdapi/user.api/users";
+    private static final String RATING_ONLINER_DOMAIN = "https://rating.onliner.by";
+    private static final String RATING_ALL_USERS = "https://rating.onliner.by/rating/users?type=overall";
+    private static final String PROFILE_USER_API = "https://profile.onliner.by/sdapi/user.api/users/";
     private ObjectMapper mapper = new ObjectMapper();
 
-    private Set<String> userProfilesSet = new HashSet<>();
+    private ArrayNode userProfiles;
     private Document sourceHTML;
     private ObjectNode rootNode;
     private String nextPageRelativePath;
 
     public OnlinerUsers() {
-        sourceHTML = readHtmlPageSourceCode(URL_ALL_USERS);
         rootNode = mapper.createObjectNode();
+        userProfiles = mapper.createArrayNode();
+        sourceHTML = readHtmlPageSourceCode(RATING_ALL_USERS);
         nextPageRelativePath = sourceHTML.getElementsByClass("next-page").first().getElementsByTag("a").first().attr("href");
     }
 
@@ -39,18 +36,24 @@ public class OnlinerUsers {
      * 2. Retrive user-data in loop.
      */
     public void obtainUserProfileURLs() {
+        long startTime = System.currentTimeMillis();
         do {
-            String nextPageAbsolutePath = ONLINER_DOMAIN + nextPageRelativePath;
+            String nextPageAbsolutePath = RATING_ONLINER_DOMAIN + nextPageRelativePath;
             readHtmlPage();
             sourceHTML = readHtmlPageSourceCode(nextPageAbsolutePath);
         } while (!nextPageRelativePath.isEmpty());
-        save();
+
+        long endTime = System.currentTimeMillis();
+        rootNode.put("timeConsumed", Duration.ofMillis(endTime - startTime).toMinutes());
+        rootNode.put("total", userProfiles.size());
+        saveAsJson();
     }
 
-    private boolean save() {
-        Path file = Paths.get("/OnlinerUsersLIST.txt");
+    private boolean saveAsJson() {
+        File file = new File("/OnlinerUsersLIST.json");
         try {
-            Files.write(file, userProfilesSet, UTF_8);
+            rootNode.set("userId", userProfiles);
+            mapper.writeValue(file, rootNode);
             System.out.println("The work should be done.");
             return true;
         } catch (IOException e) {
@@ -61,17 +64,18 @@ public class OnlinerUsers {
     }
 
     private void readHtmlPage() {
-        Elements users = sourceHTML.getElementsByClass("user");
         Element result = sourceHTML.getElementsByClass("next-page").first();
         if (result != null) {
             nextPageRelativePath = result.getElementsByTag("a").first().attr("href");
         } else {
             nextPageRelativePath = "";
         }
+        Elements users = sourceHTML.getElementsByClass("user");
         for (Element user : users) {
             String profilePath = user.attr("href");
-            String userApiUrl = URL_USER_API + profilePath.substring(profilePath.lastIndexOf('/'));
-            userProfilesSet.add(userApiUrl);
+//            String userApiUrl = PROFILE_USER_API + profilePath.substring(profilePath.lastIndexOf('/'));
+            String userId = profilePath.substring(profilePath.lastIndexOf('/') + 1);
+            userProfiles.add(userId);
 //            JsonNode userNode;
 //            userNode = JsonProcessing.uploadJsonFromURL(userApiUrl);
 //            rootNode.set(profilePath, userNode);
@@ -80,10 +84,6 @@ public class OnlinerUsers {
 
     public ObjectNode getRootNode() {
         return rootNode;
-    }
-
-    public Set<String> getUserProfilesSet() {
-        return userProfilesSet;
     }
 
     private Document readHtmlPageSourceCode(String pageUrl) {
