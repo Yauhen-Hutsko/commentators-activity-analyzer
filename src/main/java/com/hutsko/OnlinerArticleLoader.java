@@ -29,14 +29,14 @@ public class OnlinerArticleLoader implements ArticleLoader {
     private String title;
     private String views;
     private LocalDateTime created;
-    private JsonNode commentsRootNode;
+    private JsonNode fullResponseJsonNode;
 
 
     public OnlinerArticleLoader(String sourceURL) {
         this.sourceURL = sourceURL;
         Document HTMLDoc = readHtmlPageSourceCode();
         setMetaData(HTMLDoc);
-        commentsRootNode = uploadFullJsonFromURL(extractUrlForGettingComments(HTMLDoc));
+        fullResponseJsonNode = uploadFullJsonFromURL(extractUrlForGettingComments(HTMLDoc));
     }
 
     @Override
@@ -93,8 +93,8 @@ public class OnlinerArticleLoader implements ArticleLoader {
     }
 
     @Override
-    public JsonNode getCommentsRootNode() {
-        return commentsRootNode;
+    public JsonNode getFullResponseJsonNode() {
+        return fullResponseJsonNode;
     }
 
     private String extractUrlForGettingComments(Document document) {

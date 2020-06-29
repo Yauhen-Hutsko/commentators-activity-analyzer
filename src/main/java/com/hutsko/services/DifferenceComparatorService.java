@@ -37,21 +37,25 @@ public class DifferenceComparatorService {
     private JsonNode cachedJson;
     private ArticleLoader article;
     private ObjectMapper mapper;
-    private JsonNode c; // uses like a buffer for recursive method. Can be convert to local if replace recursion with if-statement
+    private JsonNode c; // uses like a buffer for recursive method. May be converted to local if replace recursion with if-statement
+    private ObjectNode rootNode;
 
     public DifferenceComparatorService(String url) {
         sourceURL = url;
         mapper = new ObjectMapper();
+        rootNode = mapper.createObjectNode();
         article = ArticleLoaderFactory.getInstance(sourceURL);
-        cachedJson = article.getCommentsRootNode().get("comments");
+        JsonNode fullJson = article.getFullResponseJsonNode();
+        cachedJson = fullJson.get("comments");
+        rootNode.put("startTrackAtQuantityOfComments", fullJson.get("total").asInt());
     }
 
     void process() {
         log.debug("DifferenceComparatorService.process():starts");
         article = ArticleLoaderFactory.getInstance(sourceURL);
-        totalComments = article.getCommentsRootNode().get("total").asInt();
+        totalComments = article.getFullResponseJsonNode().get("total").asInt();
         views = Integer.parseInt(article.getViews().replaceAll("[^\\d]", "")); //parsed from raw html data
-        freshJson = article.getCommentsRootNode().get("comments");
+        freshJson = article.getFullResponseJsonNode().get("comments");
         ObjectNode difference = separateDiffComments(freshJson, cachedJson);
         if (difference.get("stashed").size() > 0) {
             log.info("Found " + difference.get("stashed").size() + " deleted comments");
@@ -72,7 +76,6 @@ public class DifferenceComparatorService {
             throw new RuntimeException("cached json has incorrect inner structure");
         }
         ArrayList<String> sourceCommentsId = new ArrayList<>();
-        ObjectNode rootNode = mapper.createObjectNode();
         ObjectNode stashed = mapper.createObjectNode();
 
         c = mapper.createObjectNode(); //bad solution
@@ -120,10 +123,10 @@ public class DifferenceComparatorService {
 
                 ObjectNode rootNode = mapper.createObjectNode();
                 rootNode.set("stashed", storage);
-                rootNode.put("deletedTotal", deletedComments);
+                addMetaData();
                 // 5. save cache to DB
                 mapper.writeValue(f, rootNode);
-                log.info("Deleted comments was appended to file " + f.getName() + ". New quantity is: " + storage.size());
+                log.info("Deleted comments were appended to file " + f.getName() + ". New quantity is: " + storage.size());
             } else {
                 mapper.writeValue(f, deletedCommentsNode);
                 log.info("Deleted comments was written to empty file");
@@ -166,17 +169,35 @@ public class DifferenceComparatorService {
         return c;
     }
 
-
-    public int getTotalComments() {
+    int getTotalComments() {
         return totalComments;
     }
 
-    public int getViews() {
+    int getViews() {
         return views;
     }
 
-    public int getDeletedComments() {
-        return deletedComments;
+    float getInvolvedPercent(){
+        if (views == 0) {
+            return 0;
+        }
+        float involved = (float)(totalComments*100)/views;
+        String s = String.format("%.2f %n", involved);
+        return Float.valueOf(s);
+    }
+
+    float getTrueInvolvedPercent(){
+        if (views == 0) {
+            return 0;
+        }
+        float involved = (float)((totalComments + deletedComments)*100)/views;
+        String s = String.format("%.2f %n", involved);
+        return Float.valueOf(s);
+    }
+
+    private void addMetaData() {
+        rootNode.put("url", sourceURL);
+        rootNode.put("involvement", getTrueInvolvedPercent() );
+        rootNode.put("deletedTotal", deletedComments);
     }
 }
-

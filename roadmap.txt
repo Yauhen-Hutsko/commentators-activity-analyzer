@@ -20,7 +20,7 @@
 - add some web representation of interesting data (+separate article tracking, +views, +comments, deleted comments)
 - add save project version number in property file and use in pom and jsp.
 + implement Command pattern for servlet (v 1.2.4).
-- add to stashed-json fields: +deletedTotal, created, lastModified, involvement, startTrackAt.
++ add to stashed-json fields: +deletedTotal, +involvement, +startTrackAtQuantityOfComments.
 - Refactor accordingly SOLID principles
 + turn on logging
 + implement the class for checking deleted comments

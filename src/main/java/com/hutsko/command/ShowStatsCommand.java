@@ -22,7 +22,7 @@ public class ShowStatsCommand implements Command {
         String url = request.getParameter(PARAM_ARTICLE_URL);
 
         OnlinerArticleLoader parser = new OnlinerArticleLoader(url);
-        JsonAnalyzer jsonAnalyzer = new OnlinerJsonAnalyzer(parser.getCommentsRootNode());
+        JsonAnalyzer jsonAnalyzer = new OnlinerJsonAnalyzer(parser.getFullResponseJsonNode());
         CommentParserApiImpl parserApi = new CommentParserApiImpl(jsonAnalyzer);
 
         request.setAttribute("comments", jsonAnalyzer.getComments());

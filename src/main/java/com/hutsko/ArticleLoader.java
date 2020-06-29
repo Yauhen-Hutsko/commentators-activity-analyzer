@@ -13,7 +13,7 @@ public interface ArticleLoader {
 
     LocalDateTime getCreated();
 
-    JsonNode getCommentsRootNode();
+    JsonNode getFullResponseJsonNode();
 
     Document readHtmlPageSourceCode();
 
