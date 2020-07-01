@@ -27,8 +27,9 @@ import java.util.Map;
  * note: TODO:#Mustithread - every article has its own thread
  */
 public class DifferenceComparatorService {
-    public static final String TOMCAT_RESOURCE_FOLDER = "../GADB/";
     private static Logger log = LoggerFactory.getLogger(DifferenceComparatorService.class);
+
+    private static final String TOMCAT_STORAGE_FOLDER = "\\GADB\\"; //relative path under Tomcat folder
     private String sourceURL;
     private int totalComments;
     private int views;
@@ -100,7 +101,7 @@ public class DifferenceComparatorService {
         log.debug("stashComments():starts");
         // 4. open connection to DB(txt.file) and upload json for rewriting
         // Use name of the article from URL for file naming
-        File f = new File(sourceURL.substring(sourceURL.lastIndexOf('/') + 1) + ".json");
+        File f = new File(buildPath());
         if (!f.exists()) { //first encounter
             try {
                 f.createNewFile();
@@ -139,6 +140,32 @@ public class DifferenceComparatorService {
     }
 
 
+    int getTotalComments() {
+        return totalComments;
+    }
+
+    int getViews() {
+        return views;
+    }
+
+    float getInvolvedPercent(){
+        if (views == 0) {
+            return 0;
+        }
+        float involved = (float)(totalComments*100)/views;
+        String s = String.format("%.2f %n", involved);
+        return Float.valueOf(s);
+    }
+
+    float getTrueInvolvedPercent(){
+        if (views == 0) {
+            return 0;
+        }
+        float involved = (float)((totalComments + deletedComments)*100)/views;
+        String s = String.format("%.2f %n", involved);
+        return Float.valueOf(s);
+    }
+
     /**
      * This method takes upper-lvl comment node, extract comments under 'replies' node and return new jsonNode with a full list of comments.
      *
@@ -169,30 +196,9 @@ public class DifferenceComparatorService {
         return c;
     }
 
-    int getTotalComments() {
-        return totalComments;
-    }
-
-    int getViews() {
-        return views;
-    }
-
-    float getInvolvedPercent(){
-        if (views == 0) {
-            return 0;
-        }
-        float involved = (float)(totalComments*100)/views;
-        String s = String.format("%.2f %n", involved);
-        return Float.valueOf(s);
-    }
-
-    float getTrueInvolvedPercent(){
-        if (views == 0) {
-            return 0;
-        }
-        float involved = (float)((totalComments + deletedComments)*100)/views;
-        String s = String.format("%.2f %n", involved);
-        return Float.valueOf(s);
+    private String buildPath(){
+        String base = System.getProperty("catalina.base");
+        return base + TOMCAT_STORAGE_FOLDER + sourceURL.substring(sourceURL.lastIndexOf('/') + 1) + ".json";
     }
 
     private void addMetaData() {
