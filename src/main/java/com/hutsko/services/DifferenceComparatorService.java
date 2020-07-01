@@ -121,8 +121,6 @@ public class DifferenceComparatorService {
                     ((ObjectNode) storage).set(i.getKey().toString(), (JsonNode) i.getValue());
                 }
                 deletedComments += forStashNode.size();
-
-                ObjectNode rootNode = mapper.createObjectNode();
                 rootNode.set("stashed", storage);
                 addMetaData();
                 // 5. save cache to DB
