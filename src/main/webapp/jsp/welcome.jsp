@@ -1,5 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
+<fmt:setBundle basename="project" />
+
 <html>
 <head>
     <title>Welcome page</title>
@@ -7,7 +10,7 @@
 </head>
 
 <body>
-<p>ver. 1.2.4</p>
+<p>version <fmt:message key="project.ver"/></p>
 <div>
     <div class="horizon-wrapper">
         <div class="inner-div-1">

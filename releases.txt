@@ -1,3 +1,3 @@
 v.1.0 - Console app. Basic functional implemented: url->html->json parsing. Mapping data to javaBeans.
 v.1.2.0 - Comparator Service works - tasks may be added and removed. Scheduler saves deleted comments into file.
-
+v.1.2.4 - Implement design pattert Command | 16-Jun-20 15:39

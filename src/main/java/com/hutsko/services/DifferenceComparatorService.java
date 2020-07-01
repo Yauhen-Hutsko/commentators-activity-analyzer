@@ -148,20 +148,20 @@ public class DifferenceComparatorService {
         return views;
     }
 
-    float getInvolvedPercent(){
+    float getInvolvedPercent() {
         if (views == 0) {
             return 0;
         }
-        float involved = (float)(totalComments*100)/views;
+        float involved = (float) (totalComments * 100) / views;
         String s = String.format("%.2f %n", involved);
         return Float.valueOf(s);
     }
 
-    float getTrueInvolvedPercent(){
+    float getTrueInvolvedPercent() {
         if (views == 0) {
             return 0;
         }
-        float involved = (float)((totalComments + deletedComments)*100)/views;
+        float involved = (float) ((totalComments + deletedComments) * 100) / views;
         String s = String.format("%.2f %n", involved);
         return Float.valueOf(s);
     }
@@ -196,14 +196,14 @@ public class DifferenceComparatorService {
         return c;
     }
 
-    private String buildPath(){
+    private String buildPath() {
         String base = System.getProperty("catalina.base");
         return base + TOMCAT_STORAGE_FOLDER + sourceURL.substring(sourceURL.lastIndexOf('/') + 1) + ".json";
     }
 
     private void addMetaData() {
         rootNode.put("url", sourceURL);
-        rootNode.put("involvement", getTrueInvolvedPercent() );
+        rootNode.put("involvement", getTrueInvolvedPercent());
         rootNode.put("deletedTotal", deletedComments);
     }
 }
