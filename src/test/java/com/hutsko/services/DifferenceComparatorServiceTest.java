@@ -24,7 +24,8 @@ import static org.mockito.Mockito.times;
 @PowerMockIgnore({"javax.management.*", "org.apache.http.conn.ssl.*", "com.amazonaws.http.conn.ssl.*", "javax.net.ssl.*"})
 public class DifferenceComparatorServiceTest {
 
-    private final String PATH_TO_FILE = "d:\\Soft\\Tomcat 9.0_MyTomcat9\\GADB\\" + "muzykant-v-it.json";
+    private String tomcat_root = System.getenv("TOMCAT9");
+    private final String PATH_TO_FILE = tomcat_root + "\\GADB\\" + "muzykant-v-it.json";
     private JsonNode freshJson;
     private JsonNode cachedJson;
     private JsonNode oneComment;
