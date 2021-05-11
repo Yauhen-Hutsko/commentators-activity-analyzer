@@ -63,6 +63,6 @@ public class OnlinerArticleLoaderTest {
     @Test
     public void testUploadComments() throws IOException {
         JsonNode node = parser.uploadFullJsonFromURL("https://comments.api.onliner.by/news/tech.post/414510/comments?limit=99999");
-        Assert.assertEquals(node.size(), 6);
+        Assert.assertEquals(7, node.size());
     }
 }

@@ -106,10 +106,9 @@ public class OnlinerArticleLoader implements ArticleLoader {
     private void setMetaData(Document document) {
         title = !document.title().isEmpty() ? document.title() : "not found";
         views = document.getElementsByClass(DOM_CLASS_OF_VIEWS).first().childNode(0).toString();
-        String creationDate = document.getElementsByAttributeValue("name", "article:published_time").first().attr("content");
+        String creationDate = document.getElementsByAttributeValue("property", "article:published_time").first().attr("content");
         if (!creationDate.isEmpty()) {
-            this.created = LocalDateTime.parse(creationDate, DateTimeFormatter.ofPattern(
-                    "dd MMMM yyyy H:mm", Locale.US).withZone(ZoneId.of("Europe/Minsk")));
+            this.created = LocalDateTime.parse(creationDate, DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.of("Europe/Minsk")));
         }
     }
 }

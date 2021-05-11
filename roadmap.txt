@@ -17,8 +17,8 @@
 + create pom-profile for redeploy project to tomcat
 + Create test-jsp
 + find out how json with comments changes after moderation
-- add some web representation of interesting data (+separate article tracking, +views, +comments, deleted comments)
-- add save project version number in property file and use in pom and jsp.
+- add some web representation of interesting data (+separate article tracking, +views, +comments, +deleted comments)
+! add save project version number in property file and use in pom and jsp.
 + implement Command pattern for servlet (v 1.2.4).
 + add to stashed-json fields: +deletedTotal, +involvement, +startTrackAtQuantityOfComments.
 - Refactor accordingly SOLID principles
@@ -32,6 +32,7 @@
 ? Fix the mechanism of searching deleted comments (seems like currently sub-comments don't look at).
 - Fix mechanism of storage deleted subcomments (now json have doubles)
 - Create a service for reading the user base from site.
+- Plug-in release-maven-plugin
 
 Interesting metrics:
  1. How many days after publishing do ppl write comments
@@ -46,6 +47,7 @@ Interesting metrics:
  10. Was the best comment changed?
  11. Move the project to AEM.
  12. Create an index of all users.
+ 13. Index of likes/dislikes proportion for understanding who is a bot.
 
  Other ideas:
  - Telegram-bot which will show analytic for articles.
