@@ -1,5 +1,6 @@
 package com.hutsko;
 
+import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 
 /**
@@ -10,6 +11,7 @@ import org.jsoup.nodes.Node;
  */
 class RequestUrlBuilder {
     private static final String SLASH = "/";
+    private static final String PREFIX_NEWS = "news";
     private static final String COMMENT_API_PATH_START = "https://comments.api.onliner.by";
     private static final String COMMENT_API_PATH_END = SLASH + "comments?limit=%s&v=0.33252155200390354"; // seems like 'v' is unnecessary parameter and used by onliner like hash for comments.
 
@@ -25,5 +27,19 @@ class RequestUrlBuilder {
         return path.toString();
     }
 
+    static String buildUrlToClosedComments(Element htmlPageTag, int quantity) {
+        String name_A = SLASH +  PREFIX_NEWS;
+        //todo: entity_B should be extracted requested URL
+        String entity_B = htmlPageTag.getElementsByAttribute("data-io-article-url").attr("data-io-article-url");
+        String id_C = SLASH + htmlPageTag.getElementsByAttribute("news_id").attr("news_id");
+        StringBuilder path = new StringBuilder(COMMENT_API_PATH_START)
+                .append(name_A)
+                .append(SLASH)
+                .append(entity_B.substring(8, entity_B.indexOf('.')))
+                .append(".post")
+                .append(id_C)
+                .append(String.format(COMMENT_API_PATH_END, quantity));
+        return path.toString();
+    }
 
 }

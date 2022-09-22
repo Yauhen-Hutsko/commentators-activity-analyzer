@@ -99,8 +99,13 @@ public class OnlinerArticleLoader implements ArticleLoader {
 
     private String extractUrlForGettingComments(Document document) {
         Element comments = document.getElementById("fast-comments");
-        Node appNode = comments.getElementsByTag("app").first();
-        return RequestUrlBuilder.buildUrl(appNode, QUANTITY_OF_LAST_COMMENTS);
+        if (comments == null) {
+            Element newsWrapperSection = document.getElementsByClass("news-wrapper").first();
+            return RequestUrlBuilder.buildUrlToClosedComments(newsWrapperSection, QUANTITY_OF_LAST_COMMENTS);
+        }else {
+            Node appNode = comments.getElementsByTag("app").first();
+            return RequestUrlBuilder.buildUrl(appNode, QUANTITY_OF_LAST_COMMENTS);
+        }
     }
 
     private void setMetaData(Document document) {
