@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>User Profile Analytics</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css"/>
+</head>
+<body class="app">
+<header class="app-header">
+    <div>
+        <div class="brand">User Profile Analytics</div>
+        <div class="meta">Standalone view for upcoming backend integration</div>
+    </div>
+    <div class="nav-actions">
+        <a class="btn btn-light" href="jsp/welcome.jsp">Back to dashboard</a>
+    </div>
+</header>
+
+<main class="layout">
+    <section class="panel stack">
+        <div>
+            <h2>Profile snapshot</h2>
+            <p class="muted">Placeholder data. Replace with backend response later.</p>
+        </div>
+        <div class="metrics">
+            <div class="metric">
+                <span class="muted">User</span>
+                <strong>onliner_critic</strong>
+            </div>
+            <div class="metric">
+                <span class="muted">Total comments</span>
+                <strong>1,274</strong>
+            </div>
+            <div class="metric">
+                <span class="muted">Avg. replies</span>
+                <strong>12.8</strong>
+            </div>
+            <div class="metric">
+                <span class="muted">PoI</span>
+                <strong>67%</strong>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="bars">
+            <div class="bar">
+                <div class="muted">Tech posts</div>
+                <div class="bar-track"><div class="bar-fill" style="width: 82%;"></div></div>
+            </div>
+            <div class="bar">
+                <div class="muted">Economy</div>
+                <div class="bar-track"><div class="bar-fill" style="width: 48%;"></div></div>
+            </div>
+            <div class="bar">
+                <div class="muted">Gadgets</div>
+                <div class="bar-track"><div class="bar-fill" style="width: 64%;"></div></div>
+            </div>
+            <div class="bar">
+                <div class="muted">Off-topic</div>
+                <div class="bar-track"><div class="bar-fill" style="width: 22%;"></div></div>
+            </div>
+        </div>
+    </section>
+
+    <aside class="stack">
+        <section class="panel">
+            <h3>Activity trend</h3>
+            <p class="muted">Weekly activity, last 8 weeks.</p>
+            <div class="bars">
+                <div class="bar">
+                    <div class="muted">W-1</div>
+                    <div class="bar-track"><div class="bar-fill" style="width: 40%;"></div></div>
+                </div>
+                <div class="bar">
+                    <div class="muted">W-2</div>
+                    <div class="bar-track"><div class="bar-fill" style="width: 55%;"></div></div>
+                </div>
+                <div class="bar">
+                    <div class="muted">W-3</div>
+                    <div class="bar-track"><div class="bar-fill" style="width: 70%;"></div></div>
+                </div>
+                <div class="bar">
+                    <div class="muted">W-4</div>
+                    <div class="bar-track"><div class="bar-fill" style="width: 30%;"></div></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h3>Top signals</h3>
+            <div class="task-meta">
+                <span class="chip">Insightful</span>
+                <span class="chip">Debate starter</span>
+                <span class="chip">High reply rate</span>
+            </div>
+            <div class="divider"></div>
+            <p class="muted">Next: include sentiment histogram and user clustering.</p>
+        </section>
+    </aside>
+</main>
+</body>
+</html>
