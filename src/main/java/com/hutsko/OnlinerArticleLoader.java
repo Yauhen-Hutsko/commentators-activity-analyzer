@@ -29,6 +29,7 @@ public class OnlinerArticleLoader implements ArticleLoader {
     private String title;
     private String views;
     private LocalDateTime created;
+    private String previewImageUrl;
     private JsonNode fullResponseJsonNode;
 
 
@@ -36,7 +37,8 @@ public class OnlinerArticleLoader implements ArticleLoader {
         this.sourceURL = sourceURL;
         Document HTMLDoc = readHtmlPageSourceCode();
         setMetaData(HTMLDoc);
-        fullResponseJsonNode = uploadFullJsonFromURL(extractUrlForGettingComments(HTMLDoc));
+        String commentsUrl = extractUrlForGettingComments(HTMLDoc);
+        fullResponseJsonNode = (commentsUrl == null) ? null : uploadFullJsonFromURL(commentsUrl);
     }
 
     @Override
@@ -97,7 +99,16 @@ public class OnlinerArticleLoader implements ArticleLoader {
         return fullResponseJsonNode;
     }
 
+    @Override
+    public String getPreviewImageUrl() {
+        return previewImageUrl;
+    }
+
     private String extractUrlForGettingComments(Document document) {
+        if (document == null) {
+            log.error("HTML document is null. Cannot extract comments URL.");
+            return null;
+        }
         Element comments = document.getElementById("fast-comments");
         if (comments == null) {
             Element newsWrapperSection = document.getElementsByClass("news-wrapper").first();
@@ -109,11 +120,21 @@ public class OnlinerArticleLoader implements ArticleLoader {
     }
 
     private void setMetaData(Document document) {
+        if (document == null) {
+            title = "not found";
+            views = "0";
+            created = null;
+            previewImageUrl = null;
+            return;
+        }
         title = !document.title().isEmpty() ? document.title() : "not found";
-        views = document.getElementsByClass(DOM_CLASS_OF_VIEWS).first().childNode(0).toString();
+        Element viewsElement = document.getElementsByClass(DOM_CLASS_OF_VIEWS).first();
+        views = (viewsElement == null || viewsElement.childNodeSize() == 0) ? "0" : viewsElement.childNode(0).toString();
         String creationDate = document.getElementsByAttributeValue("property", "article:published_time").first().attr("content");
         if (!creationDate.isEmpty()) {
             this.created = LocalDateTime.parse(creationDate, DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.of("Europe/Minsk")));
         }
+        Element ogImage = document.getElementsByAttributeValue("property", "og:image").first();
+        previewImageUrl = (ogImage == null) ? null : ogImage.attr("content");
     }
 }

@@ -12,7 +12,7 @@
 <body class="app">
 <header class="app-header">
     <div>
-        <div class="brand">GreatAnalyzer</div>
+        <div class="brand">Onliner.by Analyzer</div>
         <div class="meta">version <fmt:message key="project.ver"/></div>
     </div>
     <div class="nav-actions">
@@ -29,16 +29,21 @@
                 <ul class="task-list">
                     <c:forEach items="${tasks}" var="task">
                         <li class="task-item">
-                            <div class="task-title">${task.value.name}</div>
-                            <div class="task-meta">
-                                <span>Views: ${task.value.views}</span>
-                                <span>Comments: ${task.value.total}</span>
-                                <span class="chip">PoI: ${task.value.involvedPercent}% (${task.value.trueInvolvedPercent}%)</span>
-                            </div>
-                            <div class="row-actions">
-                                <button type="submit" form="show-deleted" name="show-deleted" value="${task.key}">Show deleted</button>
-                                <button type="submit" form="stop-follow" name="stopFollow" value="${task.key}">Stop following</button>
-                                <a class="btn btn-light" href="${task.key}" target="_blank">Open article</a>
+                            <c:if test="${not empty task.value.previewImageUrl}">
+                                <img class="task-thumb" src="${task.value.previewImageUrl}" alt="Preview image"/>
+                            </c:if>
+                            <div class="task-item-content">
+                                <div class="task-title">${task.value.name}</div>
+                                <div class="task-meta">
+                                    <span>Views: ${task.value.views}</span>
+                                    <span>Comments: ${task.value.total}</span>
+                                    <span class="chip">PoI: ${task.value.involvedPercent}% (${task.value.trueInvolvedPercent}%)</span>
+                                </div>
+                                <div class="row-actions">
+                                    <button type="submit" form="show-deleted" name="show-deleted" value="${task.key}">Show deleted</button>
+                                    <button type="submit" form="stop-follow" name="stopFollow" value="${task.key}">Stop following</button>
+                                    <a class="btn btn-light" href="${task.key}" target="_blank">Open article</a>
+                                </div>
                             </div>
                         </li>
                     </c:forEach>

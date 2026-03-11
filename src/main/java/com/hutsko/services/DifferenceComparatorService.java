@@ -163,6 +163,9 @@ public class DifferenceComparatorService {
         String s = String.format("%.2f %n", involved);
         return Float.valueOf(s);
     }
+    String getPreviewImageUrl() {
+        return article == null ? null : article.getPreviewImageUrl();
+    }
 
     /**
      * This method takes upper-lvl comment node, extract comments under 'replies' node and return new jsonNode with a full list of comments.

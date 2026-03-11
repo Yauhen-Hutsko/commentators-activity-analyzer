@@ -101,12 +101,28 @@ a:hover {
 }
 
 .task-item {
-    display: grid;
-    gap: 10px;
+    display: flex;
+    gap: 14px;
     padding: 12px 14px;
     border: 1px solid var(--border);
     border-radius: 12px;
     background: #fbfbfa;
+}
+
+.task-thumb {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #f1f1f1;
+    flex-shrink: 0;
+}
+
+.task-item-content {
+    display: grid;
+    gap: 10px;
+    flex: 1;
 }
 
 .task-title {

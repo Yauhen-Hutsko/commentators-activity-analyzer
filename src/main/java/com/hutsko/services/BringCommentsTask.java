@@ -44,4 +44,8 @@ public class BringCommentsTask extends TimerTask {
     public float getTrueInvolvedPercent() {
         return service.getTrueInvolvedPercent();
     }
+
+    public String getPreviewImageUrl() {
+        return service.getPreviewImageUrl();
+    }
 }

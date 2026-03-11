@@ -15,6 +15,8 @@ public interface ArticleLoader {
 
     JsonNode getFullResponseJsonNode();
 
+    String getPreviewImageUrl();
+
     Document readHtmlPageSourceCode();
 
     JsonNode uploadFullJsonFromURL(String httpsRequestUrl);
