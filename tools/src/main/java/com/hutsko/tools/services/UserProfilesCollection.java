@@ -17,11 +17,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -34,6 +34,7 @@ public class UserProfilesCollection implements Runnable {
     private static final String NAME_PATTERN = "abcdefghijklmnopqrstuvwxyz0123456789";
     private static final String STORAGE_DIR = "GADB";
     private static final String USERS_FILE = "user_profiles.csv";
+    private static final String PROGRESS_FILE = "user_profiles.progress";
     private final int pauseSeconds;
     private volatile boolean stopRequested = false;
 
@@ -44,75 +45,109 @@ public class UserProfilesCollection implements Runnable {
         this.pauseSeconds = Math.max(pauseSeconds, 0);
     }
 
-    @Override
     /**
      * Runs a full crawl for all prefixes (a-z, 0-9) and writes new users to CSV.
      */
+    @Override
     public void run() {
         log.info("UserProfilesCollection started at {}", LocalDateTime.now());
-        Map<String, UserProfile> collected = new HashMap<>();
+        Map<String, UserProfile> batch = new HashMap<>();
+        Set<String> existingKeys = loadExistingUserKeys(resolveStorageFile());
+        Progress progress = loadProgress();
         final String cookieHeader = resolveCookieHeader();
-        for (int i = 0; i < NAME_PATTERN.length(); i++) {
+
+        for (int i = progress.prefixIndex; i < NAME_PATTERN.length(); i++) {
             if (shouldStop()) {
-                break;
+                persist(batch, existingKeys);
+                return;
             }
             char prefix = NAME_PATTERN.charAt(i);
-            collectByPrefix(cookieHeader, prefix, collected);
+            int start = (i == progress.prefixIndex) ? progress.startOffset : 0;
+            collectByPrefix(cookieHeader, prefix, start, batch, existingKeys);
+            persist(batch, existingKeys);
+            batch.clear();
+            saveProgress(i + 1, 0);
         }
-        if (!collected.isEmpty()) {
-            persist(collected);
-            log.info("UserProfilesCollection finished. Collected {} users.", collected.size());
-        } else {
-            log.warn("No users collected.");
-        }
+        log.info("UserProfilesCollection finished.");
     }
 
     /**
      * Collects users for a given prefix, traversing all pagination links.
      */
-    private void collectByPrefix(String cookieHeader, char prefix, Map<String, UserProfile> collected) {
-        String startUrl = MEMBERLIST_URL + "?name=" + prefix;
-        Set<String> visited = new HashSet<>();
-        ArrayDeque<String> queue = new ArrayDeque<>();
-        queue.add(startUrl);
-
-        while (!queue.isEmpty()) {
+    private void collectByPrefix(String cookieHeader, char prefix, int start,
+                                 Map<String, UserProfile> batch, Set<String> existingKeys) {
+        int currentStart = start;
+        while (true) {
             if (shouldStop()) {
-                break;
+                saveProgress(prefixIndex(prefix), currentStart);
+                return;
             }
-            String url = queue.removeFirst();
-            if (!visited.add(url)) {
-                continue;
-            }
+            String url = buildUrl(prefix, currentStart);
             Document doc = fetch(cookieHeader, url);
             if (doc == null) {
-                continue;
+                return;
             }
-            collectUsers(doc, prefix, collected);
+            int added = collectUsers(doc, prefix, batch, existingKeys);
+            if (added == 0) {
+                return;
+            }
+            int nextStart = findNextStart(doc, prefix, currentStart);
+            if (nextStart <= currentStart) {
+                return;
+            }
+            saveProgress(prefixIndex(prefix), nextStart);
             pauseBetweenRequests();
-            for (Element link : doc.select("a[href*='memberlist.php'][href*='name=" + prefix + "']")) {
-                String href = link.absUrl("href");
-                if (href != null && !href.isEmpty() && !visited.contains(href)) {
-                    queue.addLast(href);
-                }
-            }
+            currentStart = nextStart;
         }
     }
 
     /**
-     * Extracts profile links from a member list page.
+     * Extracts user rows from the member list table.
      */
-    private void collectUsers(Document document, char prefix, Map<String, UserProfile> collected) {
-        for (Element link : document.select("a[href*='memberlist.php?mode=viewprofile']")) {
-            String name = link.text().trim();
-            if (name.isEmpty()) {
+    private int collectUsers(Document document, char prefix, Map<String, UserProfile> batch, Set<String> existingKeys) {
+        Element table = document.selectFirst("div.b-userlist table");
+        if (table == null) {
+            log.warn("User list table not found for prefix {}", prefix);
+            return 0;
+        }
+        int added = 0;
+        for (Element row : table.select("tr")) {
+            Element userTd = row.selectFirst("td.user");
+            if (userTd == null) {
                 continue;
             }
-            String key = name.toLowerCase(Locale.ROOT);
-            if (!collected.containsKey(key)) {
-                collected.put(key, new UserProfile(name, link.absUrl("href"), String.valueOf(prefix)));
+            Element profileLink = userTd.selectFirst("a[href]");
+            String username = profileLink == null ? "" : profileLink.text().trim();
+            if (username.isEmpty()) {
+                continue;
+            }
+            String profileUrl = profileLink == null ? "" : profileLink.absUrl("href");
+            String userId = extractUserId(row, profileUrl);
+            String key = buildUserKey(userId, profileUrl, username);
+            if (!existingKeys.contains(key) && !batch.containsKey(key)) {
+                String avatarUrl = "";
+                Element avatarImg = row.selectFirst("td.ph img");
+                if (avatarImg != null) {
+                    avatarUrl = avatarImg.absUrl("src");
+                }
+                String status = "";
+                Element statusEl = row.selectFirst("td.user-status span");
+                if (statusEl != null) {
+                    status = statusEl.text().trim();
+                }
+                String messages = "";
+                Element msgEl = row.selectFirst("td.u-msgs");
+                if (msgEl != null) {
+                    messages = msgEl.text().trim();
+                }
+                String rankTitle = extractRankTitle(userTd, username);
+                String yearsOnSite = extractYearsOnSite(row);
+                batch.put(key, new UserProfile(userId, username, profileUrl, avatarUrl, rankTitle, status, messages, yearsOnSite, String.valueOf(prefix)));
+                existingKeys.add(key);
+                added++;
             }
         }
+        return added;
     }
 
     /**
@@ -190,25 +225,39 @@ public class UserProfilesCollection implements Runnable {
         return "target/onliner_cookies.txt";
     }
 
-    private void persist(Map<String, UserProfile> collected) {
+    private void persist(Map<String, UserProfile> batch, Set<String> existingKeys) {
+        if (batch.isEmpty()) {
+            return;
+        }
         File file = resolveStorageFile();
-        Set<String> existing = loadExistingUserKeys(file);
         boolean writeHeader = !file.exists() || file.length() == 0;
 
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.UTF_8))) {
             if (writeHeader) {
-                writer.write("username,profile_url,source_prefix");
+                writer.write("user_id,username,profile_url,avatar_url,rank_title,status,messages,years_on_site,source_prefix");
                 writer.newLine();
             }
             int appended = 0;
-            for (UserProfile profile : collected.values()) {
-                String key = profile.username.toLowerCase(Locale.ROOT);
-                if (existing.contains(key)) {
+            for (UserProfile profile : batch.values()) {
+                String key = buildUserKey(profile.userId, profile.profileUrl, profile.username);
+                if (existingKeys.contains(key)) {
                     continue;
                 }
+                writer.write(csv(profile.userId));
+                writer.write(",");
                 writer.write(csv(profile.username));
                 writer.write(",");
                 writer.write(csv(profile.profileUrl));
+                writer.write(",");
+                writer.write(csv(profile.avatarUrl));
+                writer.write(",");
+                writer.write(csv(profile.rankTitle));
+                writer.write(",");
+                writer.write(csv(profile.status));
+                writer.write(",");
+                writer.write(csv(profile.messages));
+                writer.write(",");
+                writer.write(csv(profile.yearsOnSite));
                 writer.write(",");
                 writer.write(csv(profile.sourcePrefix));
                 writer.newLine();
@@ -265,14 +314,163 @@ public class UserProfilesCollection implements Runnable {
     }
 
     private static class UserProfile {
+        private final String userId;
         private final String username;
         private final String profileUrl;
+        private final String avatarUrl;
+        private final String rankTitle;
+        private final String status;
+        private final String messages;
+        private final String yearsOnSite;
         private final String sourcePrefix;
 
-        private UserProfile(String username, String profileUrl, String sourcePrefix) {
+        private UserProfile(String userId, String username, String profileUrl, String avatarUrl,
+                            String rankTitle, String status, String messages, String yearsOnSite, String sourcePrefix) {
+            this.userId = userId == null ? "" : userId;
             this.username = username;
             this.profileUrl = profileUrl == null ? "" : profileUrl;
+            this.avatarUrl = avatarUrl == null ? "" : avatarUrl;
+            this.rankTitle = rankTitle == null ? "" : rankTitle;
+            this.status = status == null ? "" : status;
+            this.messages = messages == null ? "" : messages;
+            this.yearsOnSite = yearsOnSite == null ? "" : yearsOnSite;
             this.sourcePrefix = sourcePrefix;
+        }
+    }
+
+    private String extractUserId(Element row, String profileUrl) {
+        Element statusTd = row.selectFirst("td.user-status");
+        if (statusTd != null) {
+            String id = statusTd.attr("data-user-id");
+            if (!id.trim().isEmpty()) {
+                return id.trim();
+            }
+        }
+        Element rateStat = row.selectFirst("td.rate-stat span");
+        if (rateStat != null && !rateStat.text().trim().isEmpty()) {
+            return rateStat.text().trim();
+        }
+        if (profileUrl != null && profileUrl.matches(".*?/user/\\d+.*")) {
+            return profileUrl.replaceAll(".*?/user/(\\d+).*", "$1");
+        }
+        return "";
+    }
+
+    private String extractRankTitle(Element userTd, String username) {
+        String text = userTd.text().trim();
+        if (text.startsWith(username)) {
+            return text.substring(username.length()).trim();
+        }
+        return text;
+    }
+
+    private String extractYearsOnSite(Element row) {
+        for (Element td : row.select("td")) {
+            String text = td.text().trim();
+            if (text.contains("лет на сайте") || text.contains("год на сайте") || text.contains("года на сайте")) {
+                return text;
+            }
+        }
+        return "";
+    }
+
+    private String buildUserKey(String userId, String profileUrl, String username) {
+        if (userId != null && !userId.trim().isEmpty()) {
+            return userId.trim().toLowerCase(Locale.ROOT);
+        }
+        if (profileUrl != null && !profileUrl.trim().isEmpty()) {
+            return profileUrl.trim().toLowerCase(Locale.ROOT);
+        }
+        return username.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String buildUrl(char prefix, int start) {
+        if (start <= 0) {
+            return MEMBERLIST_URL + "?name=" + prefix;
+        }
+        return MEMBERLIST_URL + "?name=" + prefix + "&start=" + start;
+    }
+
+    private int findNextStart(Document doc, char prefix, int currentStart) {
+        int next = -1;
+        for (Element link : doc.select("a[href*='memberlist.php'][href*='name=" + prefix + "'][href*='start=']")) {
+            String href = link.absUrl("href");
+            int start = extractStartParam(href);
+            if (start > currentStart && (next < 0 || start < next)) {
+                next = start;
+            }
+        }
+        return next;
+    }
+
+    private int extractStartParam(String url) {
+        if (url == null) {
+            return -1;
+        }
+        int idx = url.indexOf("start=");
+        if (idx < 0) {
+            return -1;
+        }
+        String value = url.substring(idx + 6).replaceAll("[^0-9].*$", "");
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private int prefixIndex(char prefix) {
+        return NAME_PATTERN.indexOf(prefix);
+    }
+
+    private Progress loadProgress() {
+        File file = resolveProgressFile();
+        if (!file.exists()) {
+            return new Progress(0, 0);
+        }
+        Properties props = new Properties();
+        try (FileInputStream in = new FileInputStream(file)) {
+            props.load(in);
+            int idx = Integer.parseInt(props.getProperty("prefixIndex", "0"));
+            int start = Integer.parseInt(props.getProperty("startOffset", "0"));
+            return new Progress(Math.max(0, idx), Math.max(0, start));
+        } catch (Exception e) {
+            log.warn("Failed to read progress file {}", file.getAbsolutePath(), e);
+            return new Progress(0, 0);
+        }
+    }
+
+    private void saveProgress(int prefixIndex, int startOffset) {
+        File file = resolveProgressFile();
+        Properties props = new Properties();
+        props.setProperty("prefixIndex", String.valueOf(prefixIndex));
+        props.setProperty("startOffset", String.valueOf(startOffset));
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            props.store(out, "User profiles crawl progress");
+        } catch (IOException e) {
+            log.warn("Failed to write progress file {}", file.getAbsolutePath(), e);
+        }
+    }
+
+    private File resolveProgressFile() {
+        String base = System.getProperty("catalina.base");
+        if (base == null || base.trim().isEmpty()) {
+            base = ".";
+        }
+        File dir = new File(base, STORAGE_DIR);
+        if (!dir.exists() && !dir.mkdirs()) {
+            log.warn("Failed to create storage directory {}", dir.getAbsolutePath());
+        }
+        return new File(dir, PROGRESS_FILE);
+    }
+
+    private static class Progress {
+        private final int prefixIndex;
+        private final int startOffset;
+
+        private Progress(int prefixIndex, int startOffset) {
+            this.prefixIndex = prefixIndex;
+            this.startOffset = startOffset;
         }
     }
 }

@@ -7,7 +7,7 @@ import com.hutsko.tools.services.UserProfilesCollection;
  */
 public class UserProfilesCollectorCli {
     public static void main(String[] args) {
-        int pauseSeconds = 5;
+        int pauseSeconds = 2;
         if (args.length > 0) {
             try {
                 pauseSeconds = Integer.parseInt(args[0]);
