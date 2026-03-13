@@ -89,6 +89,9 @@
                     <input type="hidden" name="command" value="shutdownAll">
                     <button class="btn-light" type="submit">Shutdown all tasks</button>
                 </form>
+                <c:if test="${not empty userProfilesStatus}">
+                    <p class="muted">${userProfilesStatus}</p>
+                </c:if>
             </div>
         </section>
 

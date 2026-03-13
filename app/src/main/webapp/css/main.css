@@ -167,7 +167,8 @@ a:hover {
 
 input[type="url"],
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+input[type="password"] {
     width: 100%;
     padding: 10px 12px;
     border-radius: 10px;

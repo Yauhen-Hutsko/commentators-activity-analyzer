@@ -6,7 +6,9 @@ public enum  CommandType {
     TRACK(new TrackArticleCommand()),
     SHUTDOWNALL(new ShutdownAllCommand()),
     SHOWSTATS(new ShowStatsCommand()),
-    STOPFOLLOW(new StopFollowCommand())
+    STOPFOLLOW(new StopFollowCommand()),
+    STARTUSERCRAWL(new StartUserProfilesCollectionCommand()),
+    STOPUSERCRAWL(new StopUserProfilesCollectionCommand())
     ;
 
     private Command command;

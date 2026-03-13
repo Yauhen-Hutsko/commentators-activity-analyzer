@@ -42,7 +42,7 @@ public class Controller extends HttpServlet {
         Command command = ActionFactory.defineCommand(action).orElse(new EmptyCommand());
         page = command.execute(req);
         if (page != null) {
-            req.getRequestDispatcher("/jsp/welcome.jsp").forward(req, resp);
+            req.getRequestDispatcher(page).forward(req, resp);
         } else {
             resp.sendRedirect(req.getContextPath() + PATH_INDEX_PAGE);
         }

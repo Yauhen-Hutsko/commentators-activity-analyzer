@@ -66,6 +66,21 @@
 
     <aside class="stack">
         <section class="panel">
+            <h3>Admin tools</h3>
+            <form class="form-grid" method="post" action="controller">
+                <input type="hidden" name="command" value="startUserCrawl"/>
+                <label>
+                    Admin password
+                    <input type="password" name="adminPassword" placeholder="Required for crawler" required/>
+                </label>
+                <button class="btn-secondary" type="submit">Start user profile crawl</button>
+            </form>
+            <form class="form-grid" method="post" action="controller" style="margin-top: 10px;">
+                <input type="hidden" name="command" value="stopUserCrawl"/>
+                <button class="btn-light" type="submit">Stop crawler</button>
+            </form>
+        </section>
+        <section class="panel">
             <h3>Activity trend</h3>
             <p class="muted">Weekly activity, last 8 weeks.</p>
             <div class="bars">

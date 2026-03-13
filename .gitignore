@@ -5,6 +5,7 @@
 *.iml
 classes/
 target/
+tools/target/
 logs/
 
 .idea/*
