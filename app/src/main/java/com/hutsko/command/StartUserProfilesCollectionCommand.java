@@ -22,7 +22,7 @@ public class StartUserProfilesCollectionCommand implements Command {
 
         if (password == null || !password.equals(expected)) {
             request.setAttribute(ATTR_CRAWLER_STATUS, "Admin password is invalid.");
-            return "/profile.html";
+            return "/profile.jsp";
         }
 
         boolean started = UserProfilesCollectionScheduler.start(new UserProfilesCollection(pauseSeconds));
@@ -31,6 +31,6 @@ public class StartUserProfilesCollectionCommand implements Command {
         } else {
             request.setAttribute(ATTR_CRAWLER_STATUS, "User profile crawler is already running.");
         }
-        return "/profile.html";
+        return "/profile.jsp";
     }
 }

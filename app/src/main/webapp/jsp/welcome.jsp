@@ -16,7 +16,7 @@
         <div class="meta">version <fmt:message key="project.ver"/></div>
     </div>
     <div class="nav-actions">
-        <a class="btn btn-light" href="${pageContext.request.contextPath}/profile.html">User profile analytics</a>
+        <a class="btn btn-light" href="${pageContext.request.contextPath}/profile.jsp">User profile analytics</a>
         <a class="btn btn-ghost" href="${pageContext.request.contextPath}/jsp/welcome.jsp">Refresh</a>
     </div>
 </header>

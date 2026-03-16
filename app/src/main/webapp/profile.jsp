@@ -1,3 +1,8 @@
+<%@ page import="com.hutsko.tools.services.util.UserProfilesCollectionScheduler" %>
+<%@ page import="com.hutsko.tools.services.util.UserProfilesEnrichmentScheduler" %>
+<%@ page import="java.io.File" %>
+<%@ page import="java.io.FileInputStream" %>
+<%@ page import="java.util.Properties" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,6 +72,38 @@
     <aside class="stack">
         <section class="panel">
             <h3>Admin tools</h3>
+            <%
+                String crawlerStatus = (String) request.getAttribute("userProfilesStatus");
+                String enrichStatus = (String) request.getAttribute("userProfilesEnrichmentStatus");
+                boolean crawlerRunning = UserProfilesCollectionScheduler.isRunning();
+                boolean enrichRunning = UserProfilesEnrichmentScheduler.isRunning();
+                String base = System.getProperty("catalina.base");
+                if (base == null || base.trim().isEmpty()) {
+                    base = ".";
+                }
+                File progressFile = new File(new File(base, "GADB"), "user_profiles.enrich.progress");
+                String lastProcessed = "n/a";
+                if (progressFile.exists()) {
+                    Properties props = new Properties();
+                    try (FileInputStream in = new FileInputStream(progressFile)) {
+                        props.load(in);
+                        lastProcessed = props.getProperty("processedRows", "0");
+                    } catch (Exception ignored) {
+                        lastProcessed = "n/a";
+                    }
+                }
+            %>
+            <div class="task-meta">
+                <span class="chip">Crawler: <%= crawlerRunning ? "running" : "stopped" %></span>
+                <span class="chip">Enrichment: <%= enrichRunning ? "running" : "stopped" %></span>
+                <span class="chip">Enriched rows: <%= lastProcessed %></span>
+            </div>
+            <% if (crawlerStatus != null && !crawlerStatus.trim().isEmpty()) { %>
+                <p class="muted"><%= crawlerStatus %></p>
+            <% } %>
+            <% if (enrichStatus != null && !enrichStatus.trim().isEmpty()) { %>
+                <p class="muted"><%= enrichStatus %></p>
+            <% } %>
             <form class="form-grid" method="post" action="controller">
                 <input type="hidden" name="command" value="startUserCrawl"/>
                 <label>
@@ -78,6 +115,19 @@
             <form class="form-grid" method="post" action="controller" style="margin-top: 10px;">
                 <input type="hidden" name="command" value="stopUserCrawl"/>
                 <button class="btn-light" type="submit">Stop crawler</button>
+            </form>
+            <div class="divider"></div>
+            <form class="form-grid" method="post" action="controller">
+                <input type="hidden" name="command" value="startUserEnrich"/>
+                <label>
+                    Admin password
+                    <input type="password" name="adminPassword" placeholder="Required for enrichment" required/>
+                </label>
+                <button class="btn-secondary" type="submit">Start profile enrichment</button>
+            </form>
+            <form class="form-grid" method="post" action="controller" style="margin-top: 10px;">
+                <input type="hidden" name="command" value="stopUserEnrich"/>
+                <button class="btn-light" type="submit">Stop enrichment</button>
             </form>
         </section>
         <section class="panel">

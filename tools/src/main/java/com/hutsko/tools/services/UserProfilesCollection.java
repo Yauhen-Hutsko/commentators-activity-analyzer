@@ -17,8 +17,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -27,6 +29,7 @@ import java.util.Set;
 /**
  * Crawls the Onliner forum member list and persists unique user profiles to CSV.
  * Uses a Playwright-rendered HTML session to avoid receiving minimal/empty pages.
+ * Resumes from the last saved prefix/start offset and appends after each prefix.
  */
 public class UserProfilesCollection implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(UserProfilesCollection.class);
@@ -52,19 +55,22 @@ public class UserProfilesCollection implements Runnable {
     public void run() {
         log.info("UserProfilesCollection started at {}", LocalDateTime.now());
         Map<String, UserProfile> batch = new HashMap<>();
-        Set<String> existingKeys = loadExistingUserKeys(resolveStorageFile());
+        Set<String> seenKeys = loadExistingUserKeys(resolveStorageFile());
         Progress progress = loadProgress();
         final String cookieHeader = resolveCookieHeader();
+        if (cookieHeader == null || cookieHeader.trim().isEmpty()) {
+            log.warn("Cookie header is empty. Server may return minimal HTML without user data.");
+        }
 
         for (int i = progress.prefixIndex; i < NAME_PATTERN.length(); i++) {
             if (shouldStop()) {
-                persist(batch, existingKeys);
+                persist(batch);
                 return;
             }
             char prefix = NAME_PATTERN.charAt(i);
             int start = (i == progress.prefixIndex) ? progress.startOffset : 0;
-            collectByPrefix(cookieHeader, prefix, start, batch, existingKeys);
-            persist(batch, existingKeys);
+            collectByPrefix(cookieHeader, prefix, start, batch, seenKeys);
+            persist(batch);
             batch.clear();
             saveProgress(i + 1, 0);
         }
@@ -75,7 +81,7 @@ public class UserProfilesCollection implements Runnable {
      * Collects users for a given prefix, traversing all pagination links.
      */
     private void collectByPrefix(String cookieHeader, char prefix, int start,
-                                 Map<String, UserProfile> batch, Set<String> existingKeys) {
+                                 Map<String, UserProfile> batch, Set<String> seenKeys) {
         int currentStart = start;
         while (true) {
             if (shouldStop()) {
@@ -83,12 +89,14 @@ public class UserProfilesCollection implements Runnable {
                 return;
             }
             String url = buildUrl(prefix, currentStart);
-            Document doc = fetch(cookieHeader, url);
+            Document doc = fetchWithRetry(cookieHeader, url);
             if (doc == null) {
+                saveProgress(prefixIndex(prefix), currentStart);
                 return;
             }
-            int added = collectUsers(doc, prefix, batch, existingKeys);
-            if (added == 0) {
+            int added = collectUsers(doc, prefix, batch, seenKeys);
+            if (added < 0) {
+                saveProgress(prefixIndex(prefix), currentStart);
                 return;
             }
             int nextStart = findNextStart(doc, prefix, currentStart);
@@ -104,11 +112,11 @@ public class UserProfilesCollection implements Runnable {
     /**
      * Extracts user rows from the member list table.
      */
-    private int collectUsers(Document document, char prefix, Map<String, UserProfile> batch, Set<String> existingKeys) {
+    private int collectUsers(Document document, char prefix, Map<String, UserProfile> batch, Set<String> seenKeys) {
         Element table = document.selectFirst("div.b-userlist table");
         if (table == null) {
             log.warn("User list table not found for prefix {}", prefix);
-            return 0;
+            return -1;
         }
         int added = 0;
         for (Element row : table.select("tr")) {
@@ -124,7 +132,7 @@ public class UserProfilesCollection implements Runnable {
             String profileUrl = profileLink == null ? "" : profileLink.absUrl("href");
             String userId = extractUserId(row, profileUrl);
             String key = buildUserKey(userId, profileUrl, username);
-            if (!existingKeys.contains(key) && !batch.containsKey(key)) {
+            if (!seenKeys.contains(key) && !batch.containsKey(key)) {
                 String avatarUrl = "";
                 Element avatarImg = row.selectFirst("td.ph img");
                 if (avatarImg != null) {
@@ -143,7 +151,7 @@ public class UserProfilesCollection implements Runnable {
                 String rankTitle = extractRankTitle(userTd, username);
                 String yearsOnSite = extractYearsOnSite(row);
                 batch.put(key, new UserProfile(userId, username, profileUrl, avatarUrl, rankTitle, status, messages, yearsOnSite, String.valueOf(prefix)));
-                existingKeys.add(key);
+                seenKeys.add(key);
                 added++;
             }
         }
@@ -161,6 +169,21 @@ public class UserProfilesCollection implements Runnable {
             log.warn("Failed to fetch {}", url, e);
             return null;
         }
+    }
+
+    private Document fetchWithRetry(String cookieHeader, String url) {
+        int attempts = 0;
+        while (attempts < 3 && !shouldStop()) {
+            attempts++;
+            Document doc = fetch(cookieHeader, url);
+            if (doc != null) {
+                return doc;
+            }
+            if (attempts < 3) {
+                pauseBetweenRequests();
+            }
+        }
+        return null;
     }
 
     private void pauseBetweenRequests() {
@@ -225,7 +248,7 @@ public class UserProfilesCollection implements Runnable {
         return "target/onliner_cookies.txt";
     }
 
-    private void persist(Map<String, UserProfile> batch, Set<String> existingKeys) {
+    private void persist(Map<String, UserProfile> batch) {
         if (batch.isEmpty()) {
             return;
         }
@@ -239,10 +262,6 @@ public class UserProfilesCollection implements Runnable {
             }
             int appended = 0;
             for (UserProfile profile : batch.values()) {
-                String key = buildUserKey(profile.userId, profile.profileUrl, profile.username);
-                if (existingKeys.contains(key)) {
-                    continue;
-                }
                 writer.write(csv(profile.userId));
                 writer.write(",");
                 writer.write(csv(profile.username));
@@ -275,16 +294,35 @@ public class UserProfilesCollection implements Runnable {
             return existing;
         }
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
+            String header = reader.readLine();
+            int idxUserId = -1;
+            int idxProfileUrl = -1;
+            int idxUsername = -1;
+            if (header != null) {
+                String[] cols = parseCsvLine(header);
+                for (int i = 0; i < cols.length; i++) {
+                    String name = cols[i].trim().toLowerCase(Locale.ROOT);
+                    if ("user_id".equals(name)) {
+                        idxUserId = i;
+                    } else if ("profile_url".equals(name)) {
+                        idxProfileUrl = i;
+                    } else if ("username".equals(name)) {
+                        idxUsername = i;
+                    }
+                }
+            }
             String line;
-            boolean isHeader = true;
             while ((line = reader.readLine()) != null) {
-                if (isHeader) {
-                    isHeader = false;
+                if (line.trim().isEmpty()) {
                     continue;
                 }
-                String[] parts = line.split(",", -1);
-                if (parts.length > 0 && !parts[0].trim().isEmpty()) {
-                    existing.add(parts[0].trim().toLowerCase(Locale.ROOT));
+                String[] row = parseCsvLine(line);
+                String userId = valueAt(row, idxUserId);
+                String profileUrl = valueAt(row, idxProfileUrl);
+                String username = valueAt(row, idxUsername);
+                String key = buildUserKey(userId, profileUrl, username);
+                if (!key.trim().isEmpty()) {
+                    existing.add(key);
                 }
             }
         } catch (IOException e) {
@@ -311,6 +349,45 @@ public class UserProfilesCollection implements Runnable {
         }
         String sanitized = value.replace("\"", "\"\"");
         return "\"" + sanitized + "\"";
+    }
+
+    private String valueAt(String[] row, int index) {
+        if (index < 0 || index >= row.length) {
+            return "";
+        }
+        return row[index];
+    }
+
+    private String[] parseCsvLine(String line) {
+        List<String> cells = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        boolean inQuotes = false;
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (inQuotes) {
+                if (c == '"') {
+                    if (i + 1 < line.length() && line.charAt(i + 1) == '"') {
+                        sb.append('"');
+                        i++;
+                    } else {
+                        inQuotes = false;
+                    }
+                } else {
+                    sb.append(c);
+                }
+            } else {
+                if (c == '"') {
+                    inQuotes = true;
+                } else if (c == ',') {
+                    cells.add(sb.toString());
+                    sb.setLength(0);
+                } else {
+                    sb.append(c);
+                }
+            }
+        }
+        cells.add(sb.toString());
+        return cells.toArray(new String[0]);
     }
 
     private static class UserProfile {

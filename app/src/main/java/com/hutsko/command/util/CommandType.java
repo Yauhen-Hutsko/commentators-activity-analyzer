@@ -8,7 +8,9 @@ public enum  CommandType {
     SHOWSTATS(new ShowStatsCommand()),
     STOPFOLLOW(new StopFollowCommand()),
     STARTUSERCRAWL(new StartUserProfilesCollectionCommand()),
-    STOPUSERCRAWL(new StopUserProfilesCollectionCommand())
+    STOPUSERCRAWL(new StopUserProfilesCollectionCommand()),
+    STARTUSERENRICH(new StartUserProfilesEnrichmentCommand()),
+    STOPUSERENRICH(new StopUserProfilesEnrichmentCommand())
     ;
 
     private Command command;

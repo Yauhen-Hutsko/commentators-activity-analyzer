@@ -18,6 +18,6 @@ public class StopUserProfilesCollectionCommand implements Command {
         } else {
             request.setAttribute(ATTR_CRAWLER_STATUS, "User profile crawler is not running.");
         }
-        return "/profile.html";
+        return "/profile.jsp";
     }
 }

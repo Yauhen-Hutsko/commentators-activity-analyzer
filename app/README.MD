@@ -16,7 +16,7 @@ Tomcat initial setup
 
 Web UI features
 1. Track article: open the main dashboard and submit an article URL with an interval. (Deprecated: comment API does not return data anymore)
-2. User profile analytics page: use the Admin tools section to start/stop the user profile crawler.
+2. User profile analytics page: use the Admin tools section to start/stop the user profile crawler and the enrichment crawler.
 
 Crawler cookies
 1. Default cookie file (used automatically): target/onliner_cookies.txt (repo root).
@@ -33,3 +33,7 @@ Tools module usage
    mvn -q -DskipTests -pl tools exec:java -Dexec.mainClass=com.hutsko.tools.util.HttpDebugFetcher -Dexec.args="https://forum.onliner.by/memberlist.php?name=f @/absolute/path/to/cookies.txt"
 4. Run crawler CLI:
    mvn -q -DskipTests -pl tools exec:java -Dexec.mainClass=com.hutsko.tools.UserProfilesCollectorCli -Dexec.args="5"
+5. Run profile enrichment CLI:
+   mvn -q -DskipTests -pl tools exec:java -Dexec.mainClass=com.hutsko.tools.UserProfilesEnrichmentCli -Dexec.args="2"
+6. CSV output location for Tomcat runs:
+   ${catalina.base}/GADB/user_profiles.csv

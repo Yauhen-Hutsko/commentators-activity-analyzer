@@ -135,6 +135,17 @@ public class OnlinerNetworkSniffer {
         }
 
         /**
+         * Navigates to a URL, waits for the given duration, and returns the rendered HTML content.
+         */
+        public String fetchRendered(String url, int waitMillis) {
+            page.navigate(url);
+            if (waitMillis > 0) {
+                page.waitForTimeout(waitMillis);
+            }
+            return page.content();
+        }
+
+        /**
          * Waits for a fixed duration to allow async requests to complete.
          */
         public void waitFor(int millis) {
