@@ -18,7 +18,7 @@
 + Create test-jsp
 + find out how json with comments changes after moderation
 - add some web representation of interesting data (+separate article tracking, +views, +comments, +deleted comments)
-! add save project version number in property file and use in pom and jsp.
+! keep project version in property file and use in pom and jsp.
 + implement Command pattern for servlet (v 1.2.4).
 + add to stashed-json fields: +deletedTotal, +involvement, +startTrackAtQuantityOfComments.
 - Refactor accordingly SOLID principles
@@ -29,26 +29,50 @@
     + create scheduled task.
     + implement start\stop buttons for tracking articles.
 - JS: show an url inside input-field after submitting form.
-? Fix the mechanism of searching deleted comments (seems like currently sub-comments don't look at).
-- Fix mechanism of storage deleted subcomments (now json have doubles)
-- Create a service for reading the user base from site.
+ (obsolete)  Fix the mechanism of searching deleted comments (seems like currently sub-comments don't look at).
+ (obsolete) - Fix mechanism of storage deleted subcomments (now json have doubles)
++ Create a service for reading the user base from site.
 - Plug-in release-maven-plugin
+  run crawler against cyrillic symbols.
+  fetch additional user data from https://rating.onliner.by/ (rating/karma/total comments counter)
 
 Interesting metrics:
- 1. How many days after publishing do ppl write comments
- 2. +How much likes\dislikes get the most active commentator
- 3. A sex of the most active commentator(and a sex of a hero of an article). How it corresponds with a protagonist?
- 4. A gap between an article issue and the first\last comment was left.
- 5. Map of daytime activity by a commentator.
- 6. +Analyze difference and find deleted/changed comments.
- 7. Find all user activity (multi-article analysis).
- 8. Recognize a troll-activity under politic articles - newly created accounts, commenting only political articles.
- 9. Compare user comments regarding one topic at different time (e.g. seryoga).
- 10. Was the best comment changed?
+ (obsolete) 1. How many days after publishing do ppl write comments
+ (obsolete)  2. +How much likes\dislikes get the most active commentator
+  (obsolete) 3. A sex of the most active commentator(and a sex of a hero of an article). How it corresponds with a protagonist?
+  (obsolete) 4. A gap between an article issue and the first\last comment was left.
+  (obsolete) 5. Map of daytime activity by a commentator.
+  (obsolete) 6. +Analyze difference and find deleted/changed comments.
+  (obsolete) 7. Find all user activity (multi-article analysis).
+  (obsolete) 8. Recognize a troll-activity under politic articles - newly created accounts, commenting only political articles.
+  (obsolete) 9. Compare user comments regarding one topic at different time (e.g. seryoga).
+  (obsolete) 10. Was the best comment changed?
  11. Move the project to AEM.
- 12. Create an index of all users.
- 13. Index of likes/dislikes proportion for understanding who is a bot.
+ +12. Create an index of all users.
+  (obsolete) 13. Index of likes/dislikes proportion for understanding who is a bot.
 
  Other ideas:
  - Telegram-bot which will show analytic for articles.
- - Add ML to recognize comments 'mood' and find other comment of author written under pseudonyms.
+  (obsolete)  Add ML to recognize comments 'mood' and find other comment of author written under pseudonyms.
+
+  ------------ Profiles Analytic module ------------
+
+  What useful information can be extracted?
+  From current fields (user_id, username, rank_title, status, messages, years_on_site, source_prefix) I can derive:
+
+  Direct signals:
+
+  1. Message count — bots/trolls often have either 0 (sleeper accounts) or suspiciously high counts
+  2. Years on site - accounts created close to the election period are suspicious.
+  3. Rank title — maps to activity tier; mismatches between rank and years are a red flag
+  4. Status (online/offline) — real-time presence pattern.
+
+  Derived/computed signals:
+
+  1. Messages per year = messages / years_on_site — unnaturally high ratios suggest coordinated burst activity
+  2. Account age bucket — group into pre-2019, 2019–2020, post-2020 to isolate election-era registrations
+  3. Zero-message accounts — large clusters of 0-message accounts registered in the same period are a classic bot army signature
+  4. Username pattern analysis — sequential IDs with similar naming patterns (Angel-A_2012, Angel-B_2012…)
+  5. Registration date clustering — histogram of account creation by month; spikes near Aug–Nov 2020 are highly meaningful
+  6. Dormancy ratio — accounts registered but never posting
+  7. Activities in: Forum topics/Forum messages/Baracholka messages/Catalogue messages/Car messages/ Bike messages.

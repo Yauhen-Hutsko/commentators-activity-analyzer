@@ -4,6 +4,7 @@ import com.hutsko.tools.util.HttpDebugFetcher;
 import com.hutsko.tools.util.OnlinerNetworkSniffer;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +21,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,6 +39,7 @@ public class UserProfilesEnrichmentCrawler implements Runnable {
     private static final String USERS_FILE_V1 = "user_profiles(v1).csv";
     private static final String ENRICHED_FILE = "user_profiles.enriched.csv";
     private static final String PROGRESS_FILE = "user_profiles.enrich.progress";
+    private static final String RATING_BASE_URL = "https://rating.onliner.by/rating/users?type=overall";
     private static final int DEFAULT_PAUSE_SECONDS = 2;
     private static final int MAX_RETRIES = 3;
 
@@ -95,9 +99,15 @@ public class UserProfilesEnrichmentCrawler implements Runnable {
             if (!schema.hasColumn("profile_details_raw")) {
                 schema.appendColumn("profile_details_raw");
             }
-            schema.removeColumn("profile_details_raw");
-            schema.removeColumn("profile_onliner_id");
-            schema.removeColumn("profile_fields_raw");
+            if (!schema.hasColumn("rating_place")) {
+                schema.appendColumn("rating_place");
+            }
+            if (!schema.hasColumn("rating_karma")) {
+                schema.appendColumn("rating_karma");
+            }
+            if (!schema.hasColumn("rating_comments_total")) {
+                schema.appendColumn("rating_comments_total");
+            }
             if (!resume) {
                 writer.write(schema.toHeader());
                 writer.newLine();
@@ -119,6 +129,7 @@ public class UserProfilesEnrichmentCrawler implements Runnable {
             }
 
             String line;
+            Map<String, RatingEntry> ratingIndex = null;
             while ((line = reader.readLine()) != null) {
                 if (shouldStop()) {
                     saveProgress(input.getParentFile(), processed);
@@ -128,12 +139,28 @@ public class UserProfilesEnrichmentCrawler implements Runnable {
                 String profileUrl = schema.get(cells, "profile_url");
                 String createdIso = schema.get(cells, "created_at_iso");
                 String createdRaw = schema.get(cells, "created_at_raw");
+                String ratingPlace = schema.get(cells, "rating_place");
+                String ratingKarma = schema.get(cells, "rating_karma");
+                String ratingComments = schema.get(cells, "rating_comments_total");
 
                 if (isBlank(createdIso) || isBlank(createdRaw)) {
                     ProfileInfo info = fetchProfileInfoWithRetry(session, profileUrl, cookieHeader);
                     schema.set(cells, "created_at_raw", info.createdAtRaw);
                     schema.set(cells, "created_at_iso", info.createdAtIso);
                     pauseBetweenRequests();
+                }
+                if (isBlank(ratingPlace) || isBlank(ratingKarma) || isBlank(ratingComments)) {
+                    if (ratingIndex == null) {
+                        ratingIndex = loadRatingIndex();
+                    }
+                    String userId = schema.get(cells, "user_id");
+                    String username = schema.get(cells, "username");
+                    RatingEntry entry = findRatingEntry(ratingIndex, userId, username);
+                    if (entry != null) {
+                        schema.set(cells, "rating_place", entry.place);
+                        schema.set(cells, "rating_karma", entry.karma);
+                        schema.set(cells, "rating_comments_total", entry.commentsTotal);
+                    }
                 }
 
                 writer.write(schema.joinRow(cells));
@@ -223,6 +250,131 @@ public class UserProfilesEnrichmentCrawler implements Runnable {
             return matcher.group(1).trim();
         }
         return "";
+    }
+
+    private Map<String, RatingEntry> loadRatingIndex() {
+        Map<String, RatingEntry> index = new HashMap<>();
+        log.info("Loading rating index from {}", RATING_BASE_URL);
+        Document first = fetchRatingPage(1);
+        if (first == null) {
+            log.warn("Failed to load rating page 1.");
+            return index;
+        }
+        int lastPage = extractLastRatingPage(first);
+        parseRatingRows(first, index);
+        for (int page = 2; page <= lastPage; page++) {
+            if (shouldStop()) {
+                return index;
+            }
+            Document doc = fetchRatingPage(page);
+            if (doc != null) {
+                parseRatingRows(doc, index);
+            }
+            pauseBetweenRequests();
+        }
+        log.info("Rating index loaded: {} entries", index.size());
+        return index;
+    }
+
+    private Document fetchRatingPage(int page) {
+        String url = RATING_BASE_URL + "&page=" + page;
+        int attempts = 0;
+        while (attempts < MAX_RETRIES && !shouldStop()) {
+            attempts++;
+            try {
+                String html = HttpDebugFetcher.fetchResponse(url, null).body();
+                return Jsoup.parse(html, url);
+            } catch (Exception e) {
+                log.warn("Failed to fetch rating page {}", page, e);
+                if (attempts < MAX_RETRIES) {
+                    pauseBetweenRequests();
+                }
+            }
+        }
+        return null;
+    }
+
+    private int extractLastRatingPage(Document doc) {
+        int last = 1;
+        for (Element link : doc.select(".b-user-rating__pager a[href*='page=']")) {
+            int page = extractPageParam(link.absUrl("href"));
+            if (page > last) {
+                last = page;
+            }
+        }
+        return last;
+    }
+
+    private int extractPageParam(String url) {
+        if (url == null) {
+            return -1;
+        }
+        int idx = url.indexOf("page=");
+        if (idx < 0) {
+            return -1;
+        }
+        String value = url.substring(idx + 5).replaceAll("[^0-9].*$", "");
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private void parseRatingRows(Document doc, Map<String, RatingEntry> index) {
+        Element table = doc.selectFirst("table.b-user-rating__table");
+        if (table == null) {
+            log.warn("Rating table not found.");
+            return;
+        }
+        for (Element row : table.select("tr")) {
+            List<Element> tds = row.select("td");
+            if (tds.size() < 4) {
+                continue;
+            }
+            String place = tds.get(0).text().trim();
+            Element userLink = tds.get(1).selectFirst("a[href*='profile.onliner.by/user/']");
+            String profileUrl = userLink == null ? "" : userLink.absUrl("href");
+            String username = userLink == null ? tds.get(1).text().trim() : userLink.text().trim();
+            String userId = extractUserIdFromProfileUrl(profileUrl);
+            String karma = tds.get(2).text().trim();
+            String comments = tds.get(3).text().trim();
+
+            RatingEntry entry = new RatingEntry(place, karma, comments);
+            if (!userId.isEmpty()) {
+                index.putIfAbsent(ratingKey(userId), entry);
+            }
+            if (!username.isEmpty()) {
+                index.putIfAbsent(ratingKey(username), entry);
+            }
+        }
+    }
+
+    private RatingEntry findRatingEntry(Map<String, RatingEntry> index, String userId, String username) {
+        if (index == null || index.isEmpty()) {
+            return null;
+        }
+        if (userId != null && !userId.trim().isEmpty()) {
+            RatingEntry entry = index.get(ratingKey(userId));
+            if (entry != null) {
+                return entry;
+            }
+        }
+        if (username != null && !username.trim().isEmpty()) {
+            return index.get(ratingKey(username));
+        }
+        return null;
+    }
+
+    private String extractUserIdFromProfileUrl(String profileUrl) {
+        if (profileUrl == null) {
+            return "";
+        }
+        return profileUrl.replaceAll(".*?/user/(\\d+).*", "$1");
+    }
+
+    private String ratingKey(String value) {
+        return value.trim().toLowerCase(Locale.ROOT);
     }
 
     private String toIsoDate(String createdRaw) {
@@ -403,6 +555,18 @@ public class UserProfilesEnrichmentCrawler implements Runnable {
 
         private static ProfileInfo failed() {
             return new ProfileInfo("", "", false);
+        }
+    }
+
+    private static class RatingEntry {
+        private final String place;
+        private final String karma;
+        private final String commentsTotal;
+
+        private RatingEntry(String place, String karma, String commentsTotal) {
+            this.place = place == null ? "" : place;
+            this.karma = karma == null ? "" : karma;
+            this.commentsTotal = commentsTotal == null ? "" : commentsTotal;
         }
     }
 

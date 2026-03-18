@@ -31,7 +31,7 @@ Tools module usage
    mvn -q -DskipTests -pl tools exec:java -Dexec.mainClass=com.hutsko.tools.util.OnlinerNetworkSniffer -Dexec.args="https://forum.onliner.by/memberlist.php?name=f @/absolute/path/to/cookies.txt"
 3. Run HTML debug fetcher:
    mvn -q -DskipTests -pl tools exec:java -Dexec.mainClass=com.hutsko.tools.util.HttpDebugFetcher -Dexec.args="https://forum.onliner.by/memberlist.php?name=f @/absolute/path/to/cookies.txt"
-4. Run crawler CLI:
+4. Run crawler CLI: 
    mvn -q -DskipTests -pl tools exec:java -Dexec.mainClass=com.hutsko.tools.UserProfilesCollectorCli -Dexec.args="5"
 5. Run profile enrichment CLI:
    mvn -q -DskipTests -pl tools exec:java -Dexec.mainClass=com.hutsko.tools.UserProfilesEnrichmentCli -Dexec.args="2"

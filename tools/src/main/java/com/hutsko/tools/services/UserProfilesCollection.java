@@ -34,7 +34,8 @@ import java.util.Set;
 public class UserProfilesCollection implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(UserProfilesCollection.class);
     private static final String MEMBERLIST_URL = "https://forum.onliner.by/memberlist.php";
-    private static final String NAME_PATTERN = "abcdefghijklmnopqrstuvwxyz0123456789";
+    // Cyrillic lowercase alphabet for memberlist prefix crawling
+    private static final String NAME_PATTERN = "abcdefghijklmnopqrstuvwxyz0123456789абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
     private static final String STORAGE_DIR = "GADB";
     private static final String USERS_FILE = "user_profiles.csv";
     private static final String PROGRESS_FILE = "user_profiles.progress";
@@ -470,8 +471,13 @@ public class UserProfilesCollection implements Runnable {
 
     private int findNextStart(Document doc, char prefix, int currentStart) {
         int next = -1;
-        for (Element link : doc.select("a[href*='memberlist.php'][href*='name=" + prefix + "'][href*='start=']")) {
+        String prefixStr = String.valueOf(prefix);
+        for (Element link : doc.select("a[href*='memberlist.php'][href*='start=']")) {
             String href = link.absUrl("href");
+            String nameParam = extractQueryParam(href, "name");
+            if (nameParam == null || !nameParam.equals(prefixStr)) {
+                continue;
+            }
             int start = extractStartParam(href);
             if (start > currentStart && (next < 0 || start < next)) {
                 next = start;
@@ -494,6 +500,35 @@ public class UserProfilesCollection implements Runnable {
         } catch (NumberFormatException e) {
             return -1;
         }
+    }
+
+    private String extractQueryParam(String url, String param) {
+        if (url == null) {
+            return null;
+        }
+        int idx = url.indexOf('?');
+        if (idx < 0 || idx == url.length() - 1) {
+            return null;
+        }
+        String query = url.substring(idx + 1);
+        String[] parts = query.split("&");
+        for (String part : parts) {
+            int eq = part.indexOf('=');
+            if (eq <= 0) {
+                continue;
+            }
+            String key = part.substring(0, eq);
+            if (!key.equals(param)) {
+                continue;
+            }
+            String value = part.substring(eq + 1);
+            try {
+                return java.net.URLDecoder.decode(value, StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                return value;
+            }
+        }
+        return null;
     }
 
     private int prefixIndex(char prefix) {
