@@ -25,7 +25,7 @@
         <powermock.version>1.7.4</powermock.version>
         <jsonPath.version>2.4.0</jsonPath.version>
         <jackson.version>2.9.9</jackson.version>
-        <jackson.bind.version>2.9.10.4</jackson.bind.version>
+        <jackson.bind.version>2.22.0</jackson.bind.version>
         <slf4j.version>1.7.30</slf4j.version>
         <log4j.version>2.11.0</log4j.version>
         <playwright.version>1.43.0</playwright.version>
