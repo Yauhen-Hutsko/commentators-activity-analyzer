@@ -14,7 +14,7 @@
     <packaging>war</packaging>
 
     <name>greatanalyzer</name>
-    <url>http://localhost:8081/greatanalyzer</url>
+    <url>http://localhost:8080/greatanalyzer</url>
 
     <build>
         <resources>
@@ -34,7 +34,7 @@
                 <version>2.2</version>
                 <configuration>
                     <failOnError>true</failOnError>
-                    <url>http://localhost:8081/manager/text</url>
+                    <url>http://localhost:8080/manager/text</url>
                     <server>TomcatServer</server>
                     <username>war-deployer</username>
                     <password>maven-tomcat-plugin</password>
@@ -157,6 +157,10 @@
             <groupId>com.hutsko</groupId>
             <artifactId>greatanalyzer-tools</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
         </dependency>
     </dependencies>
 </project>

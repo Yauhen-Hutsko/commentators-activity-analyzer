@@ -26,7 +26,7 @@
     <section class="panel stack">
         <div>
             <h2>Profile snapshot</h2>
-            <p class="muted">Placeholder data. Replace with backend response later.</p>
+            <p class="muted">Profile analytics are processed in the backend and used for charting.</p>
         </div>
         <div class="metrics">
             <div class="metric">

@@ -37,3 +37,19 @@ Tools module usage
    mvn -q -DskipTests -pl tools exec:java -Dexec.mainClass=com.hutsko.tools.UserProfilesEnrichmentCli -Dexec.args="2"
 6. CSV output location for Tomcat runs:
    ${catalina.base}/GADB/user_profiles.csv
+
+PostgreSQL connector
+1. Default connection settings are resolved from system properties first, then environment variables.
+2. Supported keys:
+   - `db.url` / `DB_URL`
+   - `db.user` / `DB_USER`
+   - `db.password` / `DB_PASSWORD`
+   - `db.profile.table` / `DB_PROFILE_TABLE`
+   - `db.query.timeout.seconds` / `DB_QUERY_TIMEOUT_SECONDS`
+3. The backend repository can read enriched profiles or execute raw SQL for chart data preparation.
+
+Docker
+1. Build and start the full stack from the repo root:
+   `docker compose up --build`
+2. The app is exposed on `http://localhost:8080/greatanalyzer`.
+3. PostgreSQL is exposed on `localhost:5432` with database/user/password `commentators`.
