@@ -49,10 +49,14 @@ PostgreSQL connector
 3. The backend repository can read enriched profiles or execute raw SQL for chart data preparation.
 
 Docker
-1. Build and start the full stack from the repo root:
-   `docker compose up --build`
-2. The app is exposed on `http://localhost:8080/greatanalyzer`.
-3. PostgreSQL is exposed on `localhost:5432` with database/user/password `commentators`.
+1. Copy `.env.example` to `.env` (git-ignored) and set `DB_USER` / `DB_PASSWORD` for your PostgreSQL.
+   Never commit `.env`; only `.env.example` with placeholders is tracked.
+2. `docker compose up --build` starts the app only; it reads the PostgreSQL running on your machine
+   via `host.docker.internal:5432`.
+3. The app is exposed on `http://localhost:8080/greatanalyzer`.
+4. Optional throwaway DB with sample rows: set `SANDBOX_DB_PASSWORD` and
+   `DB_URL=jdbc:postgresql://db:5432/commentators` in `.env`, then `docker compose --profile sandbox up --build`
+   (exposed on `localhost:5433`).
 
 Registration analytics
 1. Page: `/greatanalyzer/analytics.jsp` (linked from the dashboard header).

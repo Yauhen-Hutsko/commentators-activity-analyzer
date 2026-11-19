@@ -1,29 +1,35 @@
+# Connection settings come from a local, git-ignored `.env` file (copy `.env.example`).
+#
+#   docker compose up --build                     -> app only, reads your existing PostgreSQL on the host
+#   docker compose --profile sandbox up --build   -> also starts a throwaway PostgreSQL with sample rows
+#                                                    (set DB_URL=jdbc:postgresql://db:5432/commentators in .env)
 services:
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: commentators
-      POSTGRES_USER: commentators
-      POSTGRES_PASSWORD: commentators
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
-
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    depends_on:
-      - db
     environment:
-      DB_URL: jdbc:postgresql://db:5432/commentators
-      DB_USER: commentators
-      DB_PASSWORD: commentators
-      DB_PROFILE_TABLE: user_profiles_enriched
+      DB_URL: ${DB_URL:-jdbc:postgresql://host.docker.internal:5432/postgres}
+      DB_USER: ${DB_USER:?Set DB_USER in .env}
+      DB_PASSWORD: ${DB_PASSWORD:-}
+      DB_PROFILE_TABLE: ${DB_PROFILE_TABLE:-user_profiles_enriched}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "8080:8080"
+
+  db:
+    profiles: ["sandbox"]
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: commentators
+      POSTGRES_USER: ${SANDBOX_DB_USER:-commentators}
+      POSTGRES_PASSWORD: ${SANDBOX_DB_PASSWORD:-}  # postgres refuses to start if empty
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
 
 volumes:
   postgres_data:

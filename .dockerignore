@@ -3,3 +3,6 @@ target
 .idea
 logs
 **/target
+.env
+.m2
+.playwright-mcp

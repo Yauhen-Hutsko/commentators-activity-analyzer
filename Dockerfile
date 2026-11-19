@@ -1,4 +1,4 @@
-FROM maven:3.9.9-eclipse-temurin-8 AS build
+FROM maven:3.9.9-eclipse-temurin-11 AS build
 WORKDIR /workspace
 
 COPY pom.xml ./
@@ -9,7 +9,7 @@ COPY tools/src tools/src
 
 RUN mvn -q -DskipTests -pl app -am package
 
-FROM tomcat:9.0-jdk8-temurin
+FROM tomcat:9.0-jdk11-temurin
 ENV CATALINA_HOME=/usr/local/tomcat
-COPY --from=build /workspace/app/target/greatanalyzer.war ${CATALINA_HOME}/webapps/greatanalyzer.war
+COPY --from=build /workspace/app/target/greatanalyzer-*.war ${CATALINA_HOME}/webapps/greatanalyzer.war
 EXPOSE 8080
