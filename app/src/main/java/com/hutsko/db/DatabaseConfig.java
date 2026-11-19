@@ -6,9 +6,10 @@ import java.util.Locale;
  * Database connection settings resolved from system properties first and then environment variables.
  */
 public final class DatabaseConfig {
-    private static final String DEFAULT_URL = "jdbc:postgresql://localhost:5432/commentators";
-    private static final String DEFAULT_USER = "commentators";
-    private static final String DEFAULT_PASSWORD = "commentators";
+    // Defaults target the local development PostgreSQL instance; Docker overrides them via DB_* env vars.
+    private static final String DEFAULT_URL = "jdbc:postgresql://localhost:5432/postgres";
+    private static final String DEFAULT_USER = System.getProperty("user.name", "postgres");
+    private static final String DEFAULT_PASSWORD = "";
     private static final String DEFAULT_PROFILE_TABLE = "user_profiles_enriched";
     private static final String DEFAULT_DRIVER = "org.postgresql.Driver";
 
@@ -36,7 +37,7 @@ public final class DatabaseConfig {
     public static DatabaseConfig load() {
         String url = firstNonBlank(systemProperty("db.url"), env("DB_URL"), DEFAULT_URL);
         String user = firstNonBlank(systemProperty("db.user"), env("DB_USER"), DEFAULT_USER);
-        String password = firstNonBlank(systemProperty("db.password"), env("DB_PASSWORD"), DEFAULT_PASSWORD);
+        String password = firstNonNull(systemProperty("db.password"), env("DB_PASSWORD"), DEFAULT_PASSWORD);
         String driver = firstNonBlank(systemProperty("db.driver"), env("DB_DRIVER"), DEFAULT_DRIVER);
         String profileTable = firstNonBlank(systemProperty("db.profile.table"), env("DB_PROFILE_TABLE"), DEFAULT_PROFILE_TABLE);
         String timeoutValue = firstNonBlank(systemProperty("db.query.timeout.seconds"), env("DB_QUERY_TIMEOUT_SECONDS"), "30");
@@ -80,6 +81,15 @@ public final class DatabaseConfig {
         for (String value : values) {
             if (value != null && !value.trim().isEmpty()) {
                 return value.trim();
+            }
+        }
+        return "";
+    }
+
+    private static String firstNonNull(String... values) {
+        for (String value : values) {
+            if (value != null) {
+                return value;
             }
         }
         return "";

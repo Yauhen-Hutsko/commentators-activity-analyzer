@@ -53,3 +53,11 @@ Docker
    `docker compose up --build`
 2. The app is exposed on `http://localhost:8080/greatanalyzer`.
 3. PostgreSQL is exposed on `localhost:5432` with database/user/password `commentators`.
+
+Registration analytics
+1. Page: `/greatanalyzer/analytics.jsp` (linked from the dashboard header).
+2. API: `GET /greatanalyzer/api/analytics/registrations?from=YYYY-MM&to=YYYY-MM` (both optional, inclusive)
+   returns `{"series":[{"month":"2020-08","count":358},...],"total":N}`.
+3. Users are de-duplicated by `user_id` (earliest `created_at_iso` wins); rows without a valid ISO date are skipped.
+4. Local run without Docker: `mvn -pl tools install -DskipTests && cd app && mvn tomcat7:run -Dmaven.tomcat.port=8090`.
+   DB defaults: `jdbc:postgresql://localhost:5432/postgres`, OS user, no password, table `user_profiles_enriched`.

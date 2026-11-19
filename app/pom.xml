@@ -91,11 +91,13 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>${servlet.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>javax.servlet.jsp-api</artifactId>
             <version>${servlet.jsp.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>

@@ -61,3 +61,4 @@ fabric.properties
 
 # Local Maven repository
 .m2/
+.playwright-mcp/

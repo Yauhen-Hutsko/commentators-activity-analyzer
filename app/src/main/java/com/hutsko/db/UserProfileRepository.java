@@ -15,7 +15,7 @@ public class UserProfileRepository {
 
     public UserProfileRepository(PostgresConnector connector, String tableName) {
         this.connector = connector;
-        this.tableName = normalizeTableName(tableName);
+        this.tableName = TableNames.validate(tableName);
     }
 
     public List<EnrichedUserProfile> findRecentProfiles(int limit) {
@@ -71,13 +71,5 @@ public class UserProfileRepository {
         } catch (Exception ignored) {
             return null;
         }
-    }
-
-    private String normalizeTableName(String value) {
-        String trimmed = value == null ? "" : value.trim();
-        if (!trimmed.matches("[A-Za-z0-9_.]+")) {
-            throw new IllegalArgumentException("Invalid PostgreSQL table name: " + value);
-        }
-        return trimmed;
     }
 }
