@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,7 +30,7 @@ import java.util.Map;
 public class DifferenceComparatorService {
     private static Logger log = LoggerFactory.getLogger(DifferenceComparatorService.class);
 
-    private static final String TOMCAT_STORAGE_FOLDER = "\\GADB\\"; //relative path under Tomcat folder
+    private static final String TOMCAT_STORAGE_FOLDER = "GADB";
     private String sourceURL;
     private int totalComments;
     private int views;
@@ -42,11 +43,14 @@ public class DifferenceComparatorService {
     private ObjectNode rootNode;
 
     public DifferenceComparatorService(String url) {
+        this(url, ArticleLoaderFactory.getInstance(url).getFullResponseJsonNode());
+    }
+
+    DifferenceComparatorService(String url, JsonNode fullJson) {
         sourceURL = url;
         mapper = new ObjectMapper();
         rootNode = mapper.createObjectNode();
-        article = ArticleLoaderFactory.getInstance(sourceURL);
-        JsonNode fullJson = article.getFullResponseJsonNode();
+        article = null;
         cachedJson = fullJson.get("comments");
         rootNode.put("startTrackAtQuantityOfComments", fullJson.get("total").asInt());
     }
@@ -199,7 +203,7 @@ public class DifferenceComparatorService {
 
     private String buildPath() {
         String base = System.getProperty("catalina.base");
-        return base + TOMCAT_STORAGE_FOLDER + sourceURL.substring(sourceURL.lastIndexOf('/') + 1) + ".json";
+        return Paths.get(base, TOMCAT_STORAGE_FOLDER, sourceURL.substring(sourceURL.lastIndexOf('/') + 1) + ".json").toString();
     }
 
     private void addMetaData() {

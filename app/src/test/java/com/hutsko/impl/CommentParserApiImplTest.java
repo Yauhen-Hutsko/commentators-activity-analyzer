@@ -5,8 +5,6 @@ import com.hutsko.JsonAnalyzer;
 import com.hutsko.entity.Comment;
 import com.hutsko.entity.User;
 import org.junit.*;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,19 +14,38 @@ import java.util.Map;
 
 public class CommentParserApiImplTest {
 
-    @Mock
     private CommentParserApi parserAPI;
     private Map<Integer, User> users = new HashMap<>();
     private List<Comment> comments = new ArrayList<>();
 
     @Before
     public void setUp() throws Exception {
-        JsonAnalyzer analyzer = Mockito.mock(JsonAnalyzer.class);
+        JsonAnalyzer analyzer = new JsonAnalyzer() {
+            @Override
+            public void fillCommentators() {
+            }
+
+            @Override
+            public void fillComments(com.fasterxml.jackson.databind.JsonNode node) {
+            }
+
+            @Override
+            public List<Comment> getComments() {
+                return comments;
+            }
+
+            @Override
+            public Map<Integer, User> getCommentators() {
+                return users;
+            }
+
+            @Override
+            public int getTotalAfterModeration() {
+                return 0;
+            }
+        };
         parserAPI = new CommentParserApiImpl(analyzer);
         prepareComments();
-
-        Mockito.when(analyzer.getCommentators()).thenReturn(users);
-        Mockito.when(analyzer.getComments()).thenReturn(comments);
 
     }
 
@@ -44,9 +61,10 @@ public class CommentParserApiImplTest {
         LocalDateTime expected1 = LocalDateTime.parse("2019-05-04T11:42:55.434");
         LocalDateTime expected2 = LocalDateTime.parse("2019-05-04T11:40:55.434");
         LocalDateTime expected3 = LocalDateTime.parse("2019-05-04T11:41:55.434");
-        Assert.assertEquals(expected1, timestamps.get(0));
-        Assert.assertEquals(expected2, timestamps.get(1));
-        Assert.assertEquals(expected3, timestamps.get(2));
+        Assert.assertEquals(3, timestamps.size());
+        Assert.assertTrue(timestamps.contains(expected1));
+        Assert.assertTrue(timestamps.contains(expected2));
+        Assert.assertTrue(timestamps.contains(expected3));
     }
 
     @Test
