@@ -6,6 +6,7 @@ COPY app/pom.xml app/pom.xml
 COPY tools/pom.xml tools/pom.xml
 COPY app/src app/src
 COPY tools/src tools/src
+COPY frontend frontend
 
 RUN mvn -q -DskipTests -pl app -am package
 

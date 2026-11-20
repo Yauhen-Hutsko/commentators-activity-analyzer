@@ -65,3 +65,8 @@ fabric.properties
 
 # Local secrets (docker compose)
 .env
+
+# Frontend build artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/.node/

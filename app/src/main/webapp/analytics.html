@@ -1,11 +1,10 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>Registration Analytics</title>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/main.css"/>
+    <title>Registration Analytics (HTML)</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css"/>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
     <style>
         .analytics { margin-top: 22px; }
@@ -24,7 +23,8 @@
         <div class="meta">New onliner.by accounts per month, around the 2020 Belarus presidential election</div>
     </div>
     <div class="nav-actions">
-        <a class="btn btn-light" href="${pageContext.request.contextPath}/jsp/welcome.jsp">Back to dashboard</a>
+        <a class="btn btn-light" href="react/">React version</a>
+        <a class="btn btn-light" href="jsp/welcome.jsp">Back to dashboard</a>
     </div>
 </header>
 
@@ -58,7 +58,7 @@
 
 <script>
     (function () {
-        var API_URL = '${pageContext.request.contextPath}/api/analytics/registrations';
+        var API_URL = 'api/analytics/registrations'; // relative to /greatanalyzer/
         var EVENTS = [
             {month: '2020-08', label: 'Election · 9 Aug 2020'}
         ];

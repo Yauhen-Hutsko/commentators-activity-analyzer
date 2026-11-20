@@ -1,0 +1,64 @@
+/* Self-contained copy of the legacy app look (css/main.css) for the parts this page uses. */
+:root {
+    --bg-1: #f3efe7;
+    --bg-2: #e5f0f2;
+    --ink-1: #1c2a30;
+    --ink-2: #4a5a64;
+    --accent: #b4572e;
+    --accent-2: #1f6f7a;
+    --panel: #ffffff;
+    --border: #d8dde0;
+    --shadow: 0 12px 30px rgba(22, 34, 40, 0.12);
+    --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+    color: var(--ink-1);
+    font-family: "Iowan Old Style", "Palatino", "Book Antiqua", "Georgia", serif;
+}
+
+.app { min-height: 100vh; padding: 28px 6vw 48px; }
+
+.app-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
+    backdrop-filter: blur(6px);
+}
+.brand { font-size: 24px; font-weight: 700; letter-spacing: 0.2px; }
+.meta { font-size: 13px; color: var(--ink-2); }
+.nav-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.analytics { margin-top: 22px; }
+.stack { display: grid; gap: 14px; }
+
+.panel {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px 20px; box-shadow: var(--shadow);
+}
+.panel h2 { margin: 0 0 12px 0; }
+.panel p { margin: 8px 0; }
+.muted { color: var(--ink-2); font-size: 13px; }
+
+.btn {
+    display: inline-block; padding: 9px 14px; border-radius: 10px;
+    border: 1px solid var(--accent); background: var(--accent); color: #fff;
+    font: inherit; font-weight: 600; cursor: pointer; text-decoration: none;
+}
+.btn-light { border-color: var(--border); background: #f7f5f2; color: var(--ink-1); }
+
+.metrics { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.metric { padding: 12px; border-radius: 12px; background: #f7f7f4; border: 1px solid var(--border); }
+.metric strong { display: block; font-size: 20px; color: var(--accent-2); }
+.metric strong.delta-down { color: var(--accent); }
+
+.chart-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.range-toggle { display: flex; gap: 8px; }
+.range-toggle .btn[aria-pressed="true"] { border-color: var(--accent-2); background: var(--accent-2); color: #fff; }
+.chart-box { height: 380px; margin-top: 12px; }
+.status { padding: 40px 0; text-align: center; }

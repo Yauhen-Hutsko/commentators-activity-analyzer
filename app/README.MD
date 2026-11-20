@@ -59,9 +59,17 @@ Docker
    (exposed on `localhost:5433`).
 
 Registration analytics
-1. Page: `/greatanalyzer/analytics.jsp` (linked from the dashboard header).
-2. API: `GET /greatanalyzer/api/analytics/registrations?from=YYYY-MM&to=YYYY-MM` (both optional, inclusive)
-   returns `{"series":[{"month":"2020-08","count":358},...],"total":N}`.
-3. Users are de-duplicated by `user_id` (earliest `created_at_iso` wins); rows without a valid ISO date are skipped.
-4. Local run without Docker: `mvn -pl tools install -DskipTests && cd app && mvn tomcat7:run -Dmaven.tomcat.port=8090`.
+1. Two implementations of the same page, both reading `GET /greatanalyzer/api/analytics/registrations?from=YYYY-MM&to=YYYY-MM`
+   (both params optional, inclusive), which returns `{"series":[{"month":"2020-08","count":358},...],"total":N}`:
+   - `/greatanalyzer/react/` - React + TypeScript + Recharts app in `frontend/` (the approach to develop further).
+   - `/greatanalyzer/analytics.html` - plain HTML + vanilla JS + Chart.js (reference only, not developed further).
+2. Users are de-duplicated by `user_id` (earliest `created_at_iso` wins); rows without a valid ISO date are skipped.
+3. `mvn package` builds the frontend too (frontend-maven-plugin downloads a pinned Node into `frontend/.node`)
+   and packs `frontend/dist` into the WAR under `/react`. Skip it with `-Dskip.installnodenpm -Dskip.npm`.
+4. Frontend development with hot reload: start the backend (Docker or `tomcat7:run` on 8080), then
+   `cd frontend && npm install && npm run dev` and open `http://localhost:5173/greatanalyzer/react/`
+   (`/greatanalyzer/api` is proxied to `http://localhost:8080`, override with `API_TARGET`).
+   Frontend tests: `npm test`.
+5. Local backend without Docker: `mvn -pl tools install -DskipTests && cd app && mvn tomcat7:run -Dmaven.tomcat.port=8080`.
+   Note: `tomcat7:run` serves `src/main/webapp` only, so use `npm run dev` for the React app in this mode.
    DB defaults: `jdbc:postgresql://localhost:5432/postgres`, OS user, no password, table `user_profiles_enriched`.
