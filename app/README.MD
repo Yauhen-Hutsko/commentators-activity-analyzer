@@ -38,6 +38,23 @@ Tools module usage
 6. CSV output location for Tomcat runs:
    ${catalina.base}/GADB/user_profiles.csv
 
+Articles crawler (onliner.by news, every article listed in the section sitemaps)
+1. Collects article metadata into the PostgreSQL table `articles` (created automatically,
+   schema in `tools/src/main/resources/sql/articles-schema.sql`):
+   - discover: reads `https://<section>.onliner.by/sitemap.xml` for people, tech, auto, realt, money (~194k articles).
+     Only sitemap-listed articles are collected. tech and auto sitemaps hold max 50,000 URLs each, so their oldest
+     articles (roughly before 2012-2013) are not included;
+   - enrich: fetches each article page and stores post_id, title, published_at, authors, categories, tags,
+     article_type, word_count, views, image_url, is_special and the raw `page_meta` JSON.
+2. Run (without `-q`, otherwise Maven hides the crawler's progress logs):
+   mvn -DskipTests -pl tools exec:java -Dexec.mainClass=com.hutsko.tools.ArticlesCrawlerCli -Dexec.args=""
+   Options: `--from YEAR` / `--to YEAR` (default: all years), `--sections people,tech`, `--pause-ms 1000` (delay between requests), `--limit N` (trial runs),
+   `--discover-only`, `--enrich-only`.
+3. Resumable: progress is stored per row (`fetch_status`: pending | ok | not_found | error; errors are retried up to 3 times).
+   Stop with Ctrl+C and rerun the same command to continue.
+4. At the default 1 request/second, fetching all ~194k pages takes roughly 2.5-3 days (resumable).
+5. Progress: `select section, fetch_status, count(*) from articles group by 1, 2 order by 1, 2;`
+
 PostgreSQL connector
 1. Default connection settings are resolved from system properties first, then environment variables.
 2. Supported keys:
